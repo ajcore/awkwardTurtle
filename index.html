@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<style>
+canvas {
+    border: 1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+</style>
+</head>
+<body onload="startGame()">
+<script>
+function startGame() {
+    pool.start();
+	turtle1 = new turtle("green", 150, 250);
+	turtle2 = new turtle("red", 350, 250);
+	//turtle3 = new turtle("blue", 550, 250);
+}
+
+var pool = {
+    canvas: document.createElement("canvas"),
+	start: function() {
+		this.canvas.width = 800;
+		this.canvas.height = 600;
+		this.context = this.canvas.getContext("2d");
+		document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+	}
+}
+
+function turtle(color, x, y){
+	this.X = x;
+	this.Y = y;
+	ctx = pool.context;
+	ctx.strokeStyle = color;
+	ctx.rotate(10 * Math.PI/180);
+	//top shell
+	ctx.moveTo(x+40, y+100);
+	ctx.bezierCurveTo(x+40, y+20, x+170, y+20, x+170, y+100);
+	//mid shell
+	ctx.moveTo(x+41, y+90);
+	ctx.bezierCurveTo(x+41, y+110, x+169, y+110, x+169, y+90);
+	ctx.moveTo(x+40, y+100);
+	ctx.bezierCurveTo(x+40, y+120, x+170, y+120, x+170, y+100);
+	//bottom shell
+	ctx.moveTo(x+55,y+112);
+	ctx.bezierCurveTo(x+50, y+130, x+160, y+130, x+155, y+112);
+
+	//legs
+	ctx.moveTo(x+40, y+100);
+	ctx.bezierCurveTo(x+20, y+140, x+45, y+140, x+55, y+110);
+	ctx.moveTo(x+170, y+100);
+	ctx.bezierCurveTo(x+190, y+140, x+165, y+140, x+155, y+110);
+	//tail
+	ctx.moveTo(x+170, y+100);
+	ctx.lineTo(x+190, y+95);
+	ctx.lineTo(x+170, y+90);
+	//head
+	ctx.moveTo(x+40, y+100);
+	ctx.bezierCurveTo(x+0, y+100, x+0, y+60, x+40, y+90);
+	ctx.stroke();
+	
+}
+
+//ctx.stroke();
+//c.clearRect(0, 0, c.width, c.height);
+</script> 
+
+</body>
+</html>
