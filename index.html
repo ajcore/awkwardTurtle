@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
 <style>
 canvas {
     border: 1px solid #d3d3d3;
@@ -10,13 +11,27 @@ canvas {
 </head>
 <body onload="startGame()">
 <script>
+var turtle1;
+var turtle2;
+var water1;
+
 function startGame() {
     pool.start();
 	turtle1 = new turtle("green", 150, 250);
-	turtle2 = new turtle("red", 350, 250);
-	bubble1 = new bubble("blue", 250);
-	
+	turtle2 = new turtle("red", 350, 250);	
 	water1 = new water(100);
+}
+
+function updateGame() {
+    pool.clear();
+    // if (pool.x && pool.y) {
+    //     if (water1.clicked()) {
+    //         //TODO: create bubble
+	// 	}
+    // }
+    turtle1.update();        
+    turtle2.update();        
+    water1.update();  
 }
 
 var pool = {
@@ -26,61 +41,90 @@ var pool = {
 		this.canvas.height = 600;
 		this.context = this.canvas.getContext("2d");
 		document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-	}
+		this.interval = setInterval(updateGame, 20);
+		window.addEventListener('mousedown', function (e) {
+            pool.x = e.pageX;
+            pool.y = e.pageY;
+        })
+		window.addEventListener('touchstart', function (e) {
+            myGameArea.x = e.pageX;
+            myGameArea.y = e.pageY;
+        })
+        window.addEventListener('touchend', function (e) {
+            myGameArea.x = false;
+            myGameArea.y = false;
+        })
+	},
+	clear : function(){
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
 };
 
 function turtle(color, x, y){
 	this.X = x;
 	this.Y = y;
-	ctx = pool.context;
-	ctx.beginPath();
-	ctx.strokeStyle = color;
-	//top shell
-	ctx.moveTo(x+40, y+100);
-	ctx.bezierCurveTo(x+40, y+20, x+170, y+20, x+170, y+100);
-	//mid shell
-	ctx.moveTo(x+41, y+90);
-	ctx.bezierCurveTo(x+41, y+110, x+169, y+110, x+169, y+90);
-	ctx.moveTo(x+40, y+100);
-	ctx.bezierCurveTo(x+40, y+120, x+170, y+120, x+170, y+100);
-	//bottom shell
-	ctx.moveTo(x+55,y+112);
-	ctx.bezierCurveTo(x+50, y+130, x+160, y+130, x+155, y+112);
+	this.awake = false;
+	this.onBack = true;
+	this.update = function() {
+		ctx = pool.context;
+		ctx.beginPath();
+		ctx.strokeStyle = color;
+		//top shell
+		ctx.moveTo(x+40, y+100);
+		ctx.bezierCurveTo(x+40, y+20, x+170, y+20, x+170, y+100);
+		//mid shell
+		ctx.moveTo(x+41, y+90);
+		ctx.bezierCurveTo(x+41, y+110, x+169, y+110, x+169, y+90);
+		ctx.moveTo(x+40, y+100);
+		ctx.bezierCurveTo(x+40, y+120, x+170, y+120, x+170, y+100);
+		//bottom shell
+		ctx.moveTo(x+55,y+112);
+		ctx.bezierCurveTo(x+50, y+130, x+160, y+130, x+155, y+112);
 
-	//legs
-	ctx.moveTo(x+40, y+100);
-	ctx.bezierCurveTo(x+20, y+140, x+45, y+140, x+55, y+110);
-	ctx.moveTo(x+170, y+100);
-	ctx.bezierCurveTo(x+190, y+140, x+165, y+140, x+155, y+110);
-	//tail
-	ctx.moveTo(x+170, y+100);
-	ctx.lineTo(x+190, y+95);
-	ctx.lineTo(x+170, y+90);
-	//head
-	ctx.moveTo(x+40, y+100);
-	ctx.bezierCurveTo(x+0, y+100, x+0, y+60, x+40, y+90);
-	ctx.stroke();
-	ctx.closePath();
-}
+		//legs
+		ctx.moveTo(x+40, y+100);
+		ctx.bezierCurveTo(x+20, y+140, x+45, y+140, x+55, y+110);
+		ctx.moveTo(x+170, y+100);
+		ctx.bezierCurveTo(x+190, y+140, x+165, y+140, x+155, y+110);
+		//tail
+		ctx.moveTo(x+170, y+100);
+		ctx.lineTo(x+190, y+95);
+		ctx.lineTo(x+170, y+90);
+		//head
+		ctx.moveTo(x+40, y+100);
+		ctx.bezierCurveTo(x+0, y+100, x+0, y+60, x+40, y+90);
+		ctx.stroke();
+		ctx.closePath();
+	}
 
-function bubble(color, x) {
-	
-	ctx = pool.context;
-	ctx.beginPath();
-	ctx.strokeColor = color;
-	ctx.arc(x, 500, 50, 0, 2 * Math.PI);
-	ctx.stroke();
-	ctx.closePath();
+	this.onMove = function() {
+		this.awake = true;
+	}
 }
 
 function water(y) {
-	ctx = pool.context;
-	ctx.beginPath();
-	ctx.strokeStyle = blue;
-	ctx.moveTo(0, y);
-	ctx.lineTo(800, y);
-	ctx.stroke();
-	ctx.closePath();
+	var water = this;
+	
+	this.update = function() {
+		ctx = pool.context;
+		ctx.beginPath();
+		ctx.strokeStyle = "blue";
+		ctx.globalAlpha = 0.0;
+    	ctx.fillRect(0,0,800,600);
+		ctx.closePath();
+		ctx.beginPath();
+		ctx.moveTo(0, y);
+		ctx.lineTo(800, y);
+		ctx.stroke();
+		ctx.closePath();
+	}
+	
+
+	this.clicked = function(x) {
+		//TODO: Create a bubble at x
+		//click should be the whole screen and only care about the x axis.
+	
+	}
 }
 </script> 
 
