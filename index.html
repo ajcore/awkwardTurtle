@@ -145,6 +145,7 @@ function water(y) {
 function bubble(x) {
 	this.X = x;
 	this.update = function () {
+		//TODO: bubble pop animation
 		ctx = pool.context;
 		ctx.beginPath();
 		ctx.strokeStyle = "blue";
@@ -157,10 +158,23 @@ function bubble(x) {
 //on click above water, gather water at the top and create raindrop at x position
 function raindrop(x) {
 	this.X = x;
+	this.Y = 50;
+	this.speed = 0;
 	this.update = function () {
 		ctx = pool.context;
 		//TODO: water gather animation to form droplet and drop.
-		
+		ctx.strokeStyle="blue";
+		ctx.beginPath();
+		ctx.moveTo(this.X,this.Y-50);
+		ctx.bezierCurveTo(this.X-50, this.Y, this.X+50, this.Y, this.X, this.Y-50);
+		ctx.stroke();
+		ctx.closePath();
+		this.speed = 1;
+		this.newPos();
+		this.speed = 0;
+	}
+	this.newPos = function() {
+		this.Y += this.speed;
 	}
 }
 
