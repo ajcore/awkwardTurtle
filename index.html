@@ -12,16 +12,27 @@ canvas {
 <body onload="startGame()">
 <script>
     var player;
+    var walls = [];
+    //for logging what keys are pressed
     var keys = [];
+    var background1;
 
     function startGame() {
         race.start();
         player = new turtle(100, 300);
+        // wall1 = new wall(200,50, 500, 20);
+        // wall2 = new wall(200,50, 1000, 200);
+        // walls.push(wall1);
+        // walls.push(wall2);
+        background1 = new background();
     }
 
     function updateGame() {
         race.clear();
         
+        // background1.move();
+        background1.update();
+
         player.speedX = 0;
         player.speedY = 0;
         if (keys[37]) {
@@ -38,6 +49,10 @@ canvas {
         }
         player.move();
         player.update();
+
+        for (var i=0; i < walls.length; i++) {
+            walls[i].update();
+        }
     }
 
     var race  = {
@@ -73,6 +88,39 @@ canvas {
         }
     }
 
+    function background() {
+        this.X = 0;
+        this.speed = 1;
+        
+        this.update = function() {
+            ctx = race.context;
+            
+            var color1 = "#F2EEB3"; //light
+            var color2="#CCC897"; //dark
+            var numberOfStripes = 50;		
+            for (var i=0;i<numberOfStripes*2;i++){
+                var thickness = race.canvas.width / numberOfStripes;
+                ctx.beginPath();
+                ctx.strokeStyle = i % 2?color1:color2;
+                ctx.lineWidth =thickness;
+                ctx.lineCap = 'round';
+                
+                ctx.moveTo(i*thickness + thickness/2 - race.canvas.width,0);
+                ctx.lineTo(0 + i*thickness+thickness/2,race.canvas.width);
+                ctx.stroke();
+            }
+           
+        }
+        this.move = function () {
+            this.X -= this.speed;
+            if (this.X < (-1 * bandWidth)) {
+                console.log(this.X + ", " + bandWidth);
+                this.X = 0;
+            }
+        }
+    }
+
+
     function turtle(x, y) {
         this.X = x;
         this.Y = y;
@@ -102,6 +150,26 @@ canvas {
         this.move = function() {
             this.X += this.speedX;
             this.Y += this.speedY;
+        }
+    }
+
+    function wall(w, h, x, y) {
+        this.width = w;
+        this.height = h;
+        this.X = x;
+        this.Y = y;
+        this.speed = 1;
+        this.update = function() {
+            ctx = race.context;
+            ctx.beginPath();
+            ctx.rect(this.X, this.Y, this.width, this.height);
+            ctx.stroke();
+            this.move();
+            ctx.closePath();
+        }
+
+        this.move = function() {
+            this.X -= this.speed;
         }
     }
 
