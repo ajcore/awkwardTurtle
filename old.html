@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<style>
+canvas {
+    border: 1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+</style>
+</head>
+<body onload="startGame()">
+<script>
+var turtle1;
+var turtle2;
+var water1;
+var bubbles = [];
+var raindrops = [];
+
+
+function startGame() {
+    pool.start();
+	turtle1 = new turtle("green", 150, 200);
+	turtle2 = new turtle("red", 350, 200);	
+	water1 = new water(300);
+}
+
+function updateGame() {
+    pool.clear();
+    // if (pool.x && pool.y) {
+    //     if (water1.clicked()) {
+    //         //TODO: create bubble
+	// 	}
+    // }
+    turtle1.update();        
+    turtle2.update();        
+    water1.update();
+	for (var i = 0; i < bubbles.length; i++) {
+		bubbles[i].update();
+	}
+	for (var j = 0; j < raindrops.length; j++) {
+		raindrops[j].update();
+	}
+}
+
+function clickAction() {
+	if (pool.y >= water1.Y) {
+		//clicked below water line, create a bubble
+		console.log("Creating bubble");
+		var bubble1 = new bubble(pool.x);
+		bubbles.push(bubble1);
+	} else {
+		//clicked above water line, create a raindrop
+		console.log("Creating raindrop");
+		var raindrop1 = new raindrop(pool.x);
+		raindrops.push(raindrop1);
+	}
+}
+
+var pool = {
+    canvas: document.createElement("canvas"),
+	start: function() {
+		this.canvas.width = 800;
+		this.canvas.height = 600;
+		this.context = this.canvas.getContext("2d");
+		document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+		this.interval = setInterval(updateGame, 20);
+		window.addEventListener('mouseup', function (e) {
+            pool.x = e.pageX;
+            pool.y = e.pageY;
+			clickAction();
+        })
+		window.addEventListener('touchstart', function (e) {
+            pool.x = e.pageX;
+            pool.y = e.pageY;
+        })
+        window.addEventListener('touchend', function (e) {
+            pool.x = false;
+            pool.y = false;
+        })
+	},
+	clear : function(){
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+};
+
+function turtle(color, x, y){
+	this.X = x;
+	this.Y = y;
+	this.awake = false;
+	this.onBack = true;
+	this.update = function() {
+		ctx = pool.context; 
+		ctx.beginPath();
+		ctx.strokeStyle = color;
+		//top shell
+		ctx.moveTo(x+40, y+100);
+		ctx.bezierCurveTo(x+40, y+20, x+170, y+20, x+170, y+100);
+		//mid shell
+		ctx.moveTo(x+41, y+90);
+		ctx.bezierCurveTo(x+41, y+110, x+169, y+110, x+169, y+90);
+		ctx.moveTo(x+40, y+100);
+		ctx.bezierCurveTo(x+40, y+120, x+170, y+120, x+170, y+100);
+		//bottom shell
+		ctx.moveTo(x+55,y+112);
+		ctx.bezierCurveTo(x+50, y+130, x+160, y+130, x+155, y+112);
+
+		//legs
+		ctx.moveTo(x+40, y+100);
+		ctx.bezierCurveTo(x+20, y+140, x+45, y+140, x+55, y+110);
+		ctx.moveTo(x+170, y+100);
+		ctx.bezierCurveTo(x+190, y+140, x+165, y+140, x+155, y+110);
+		//tail
+		ctx.moveTo(x+170, y+100);
+		ctx.lineTo(x+190, y+95);
+		ctx.lineTo(x+170, y+90);
+		//head
+		ctx.moveTo(x+40, y+100);
+		ctx.bezierCurveTo(x+0, y+100, x+0, y+60, x+40, y+90);
+		ctx.stroke();
+		ctx.closePath();
+	}
+
+	this.onMove = function() {
+		this.awake = true;
+	}
+}
+
+function water(y) {
+	this.Y = y;
+	
+	this.update = function() {
+		ctx = pool.context;
+		ctx.beginPath();
+		ctx.strokeStyle = "blue";
+		ctx.moveTo(0, y);
+		ctx.lineTo(800, y);
+		ctx.stroke();
+		ctx.closePath();
+	}
+	
+}
+
+//on click below water, create bubble at the bottom and rise at x position
+function bubble(x) {
+	this.X = x;
+	this.Y = pool.canvas.Y;
+	this.speed = 0;
+	this.update = function () {
+		//TODO: bubble pop animation
+		ctx = pool.context;
+		ctx.beginPath();
+		ctx.strokeStyle = "blue";
+		ctx.arc(this.X, this.Y, 50, 0, 2 * Math.PI);
+		ctx.stroke(); 
+		ctx.closePath();
+		this.speed = 1;
+		this.newPos();
+		this.speed = 0;
+	}
+
+	this.newPos = function() {
+		this.Y -= this.speed;
+	}
+}
+
+//on click above water, gather water at the top and  create raindrop at x position
+function raindrop(x) {
+	this.X = x;
+	this.Y = 50;
+	this.speed = 0;
+	this.update = function () {
+		ctx = pool.context;
+		//TODO: water gather animation to form droplet and drop.
+		ctx.strokeStyle="blue";
+		ctx.beginPath();
+		ctx.moveTo(this.X,this.Y-50);
+		ctx.bezierCurveTo(this.X-50, this.Y, this.X+50, this.Y, this.X, this.Y-50);
+		ctx.stroke();
+		ctx.closePath();
+		this.speed = 1;
+		this.newPos();
+		this.speed = 0;
+	}
+	this.newPos = function() {
+		this.Y += this.speed;
+	}
+}
+
+</script> 
+
+</body>
+</html>
