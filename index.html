@@ -24,13 +24,13 @@ canvas {
         // wall2 = new wall(200,50, 1000, 200);
         // walls.push(wall1);
         // walls.push(wall2);
-        background1 = new background();
+        background1 = new background(50);
     }
 
     function updateGame() {
         race.clear();
         
-        // background1.move();
+        background1.move();
         background1.update();
 
         player.speedX = 0;
@@ -88,33 +88,33 @@ canvas {
         }
     }
 
-    function background() {
+    function background(stripes) {
         this.X = 0;
         this.speed = 1;
+        this.numberOfStripes = stripes;
         
         this.update = function() {
             ctx = race.context;
             
             var color1 = "#F2EEB3"; //light
             var color2="#CCC897"; //dark
-            var numberOfStripes = 50;		
-            for (var i=0;i<numberOfStripes*2;i++){
-                var thickness = race.canvas.width / numberOfStripes;
+            for (var i=0;i<this.numberOfStripes*3;i++){
+                var thickness = race.canvas.width / this.numberOfStripes;
                 ctx.beginPath();
                 ctx.strokeStyle = i % 2?color1:color2;
                 ctx.lineWidth =thickness;
                 ctx.lineCap = 'round';
                 
-                ctx.moveTo(i*thickness + thickness/2 - race.canvas.width,0);
-                ctx.lineTo(0 + i*thickness+thickness/2,race.canvas.width);
+                ctx.moveTo(i*thickness + thickness/2 - race.canvas.width + this.X,0);
+                ctx.lineTo(this.X + i*thickness+thickness/2,race.canvas.width);
                 ctx.stroke();
+                ctx.closePath();
             }
            
         }
         this.move = function () {
             this.X -= this.speed;
-            if (this.X < (-1 * bandWidth)) {
-                console.log(this.X + ", " + bandWidth);
+            if (this.X <= (-1* this.numberOfStripes*3)) {
                 this.X = 0;
             }
         }
