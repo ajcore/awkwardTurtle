@@ -20,17 +20,15 @@ canvas {
     function startGame() {
         race.start();
         player = new turtle(100, 300);
-        // wall1 = new wall(200,50, 500, 20);
-        // wall2 = new wall(200,50, 1000, 200);
-        // walls.push(wall1);
-        // walls.push(wall2);
-        background1 = new background(50);
+        twit1 = new twitter(200,50);
+        twit2 = new twitter(100, 200);
+        walls.push(twit1);
+        walls.push(twit2);
+        background1 = new background();
     }
 
     function updateGame() {
         race.clear();
-        
-        background1.move();
         background1.update();
 
         player.speedX = 0;
@@ -95,28 +93,11 @@ canvas {
         
         this.update = function() {
             ctx = race.context;
-            
-            var color1 = "#F2EEB3"; //light
-            var color2="#CCC897"; //dark
-            for (var i=0;i<this.numberOfStripes*3;i++){
-                var thickness = race.canvas.width / this.numberOfStripes;
-                ctx.beginPath();
-                ctx.strokeStyle = i % 2?color1:color2;
-                ctx.lineWidth =thickness;
-                ctx.lineCap = 'round';
-                
-                ctx.moveTo(i*thickness + thickness/2 - race.canvas.width + this.X,0);
-                ctx.lineTo(this.X + i*thickness+thickness/2,race.canvas.width);
-                ctx.stroke();
-                ctx.closePath();
-            }
-           
-        }
-        this.move = function () {
-            this.X -= this.speed;
-            if (this.X <= (-1* this.numberOfStripes*3)) {
-                this.X = 0;
-            }
+            ctx.beginPath();
+            ctx.rect(0,0,race.canvas.width, race.canvas.height);
+            ctx.closePath();
+            ctx.fillStyle = "black";
+            ctx.fill();
         }
     }
 
@@ -130,49 +111,94 @@ canvas {
         this.currentFrame = 0;
         this.isJumping = false;
         this.flip = false;
-        var step1 = new Image();
-        var step2 = new Image();
-        var idle = new Image();
-        step1.src = "./assets/images/turtleL2.png";
-        step2.src = "./assets/images/turtleL3.png";
-        idle.src = "./assets/images/turtleL.png";
         this.update = function() {
             ctx = race.context;
+            //back legs
             ctx.beginPath();
-            if (this.flip) {
-                step1.src = "./assets/images/turtleL.png";
-                step2.src = "./assets/images/turtleL.png";
-            } else {
-                step1.src = "./assets/images/turtleL2.png";
-                step2.src = "./assets/images/turtleL3.png";
-            }
-            if (this.currentFrame >= this.frameSpeed) {
-                ctx.drawImage(step1, this.X, this.Y);
-                if (this.currentFrame >= (2*this.frameSpeed)) {
-                    this.currentFrame = 0;
-                }
-            } else {
-                ctx.drawImage(step2, this.X, this.Y);
-            }
+            ctx.moveTo(this.X + 15, this.Y + 45);
+            ctx.bezierCurveTo(this.X + 15, this.Y + 40, this.X, this.Y +30, this.X, this.Y + 50);
             ctx.closePath();
-            this.currentFrame += 1;
+            ctx.fillStyle = "green";
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(this.X + 45, this.Y + 60);
+            ctx.bezierCurveTo(this.X + 5, this.Y + 75,this. X + 5, this.Y + 90, this.X + 15, this.Y + 90);
+            ctx.closePath();
+            ctx.fillStyle = "green";
+            ctx.fill();
+
+            //back shell
+            ctx.beginPath();
+            ctx.moveTo(this.X + 30, this.Y + 30);
+            ctx.bezierCurveTo(this.X + 65,this.Y + 30,this.X + 65,this.Y + 70,this.X + 50, this.Y + 70);
+            ctx.bezierCurveTo(this.X + 55, this.Y +70,this.X + 55,this.Y + 30,this.X + 30,this.Y + 30);
+            ctx.closePath();
+
+            ctx.fillStyle="brown";
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(this.X +30,this.Y + 30);
+            ctx.bezierCurveTo(this.X + 55,this.Y + 30,this.X + 55,this.Y + 70,this.X + 50,this.Y + 70);
+            ctx.bezierCurveTo(this.X + 50, this.Y + 80,this.X + 15, this.Y + 80,this.X +15,this.Y +70);
+            ctx.bezierCurveTo(this.X + 10,this.Y + 70,this.X + 10,this.Y + 35,this.X + 15,this.Y + 35);
+            ctx.bezierCurveTo(this.X + 15,this.Y + 30,this.X + 35, this.Y + 30, this.X + 35, this.Y + 35);
+            ctx.closePath();
+
+            ctx.fillStyle="#f0e5c7";
+            ctx.fill();
+
+            //front legs
+            ctx.beginPath();
+            ctx.moveTo(this.X + 25, this.Y + 40);
+            ctx.bezierCurveTo(this.X + 25, this.Y + 50, this.X + 45, this.Y + 50, this.X + 45, this.Y + 40);
+            ctx.closePath();
+            ctx.fillStyle = "green";
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(this.X + 45,this.Y + 70);
+            ctx.bezierCurveTo(this.X + 35, this.Y + 80, this.X + 50, this.Y + 90, this.X + 55, this.Y + 80);
+            ctx.closePath();
+            ctx.fillStyle = "green";
+            ctx.fill();
+
+            //head
+            ctx.beginPath();
+            ctx.moveTo(this.X + 20, this.Y + 10);
+            ctx.lineTo(this.X + 20, this.Y + 30);
+            ctx.bezierCurveTo(this.X + 20, this.Y + 35, this.X + 30, this.Y + 35, this.X + 30, this.Y + 30);
+            ctx.lineTo(this.X + 30, this.Y + 25);
+            ctx.bezierCurveTo(this.X + 30, this.Y + 20, this.X + 35, this.Y + 20, this.X + 35, this.Y + 20);
+            ctx.bezierCurveTo(this.X + 50, this.Y + 20, this.X + 50, this.Y, this.X + 35, this.Y);
+            ctx.bezierCurveTo(this.X + 20, this.Y, this.X + 20, this.Y + 10, this.X + 20, this.Y + 10);
+            ctx.closePath();
+
+            ctx.fillStyle="green";
+            ctx.fill();
+
+            //eyes
+            ctx.beginPath();
+            ctx.rect(this.X + 30, this.Y + 5, 2, 5);
+            ctx.closePath();
+            ctx.fillStyle="black";
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.rect(this.X + 40, this.Y + 5, 2, 5);
+            ctx.closePath();
+            ctx.fillStyle="black";
+            ctx.fill();
         }
         this.move = function() {
-            if (keys[39]) {
-                this.flip = true;
-            }
-            if (keys[37]) {
-                this.flip = false;
-            }
             this.X += this.speedX;
             this.Y += this.speedY;
         }
 
     }
 
-    function wall(w, h, x, y) {
-        this.width = w;
-        this.height = h;
+    function twitter(x, y) {
         this.X = x;
         this.Y = y;
         this.speed = 1;
@@ -180,9 +206,11 @@ canvas {
             ctx = race.context;
             ctx.beginPath();
             ctx.rect(this.X, this.Y, this.width, this.height);
-            ctx.stroke();
-            this.move();
             ctx.closePath();
+            ctx.fillStyle="blue";
+            ctx.fill();
+
+            this.move();
         }
 
         this.move = function() {
