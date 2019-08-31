@@ -20,6 +20,25 @@ canvas {
 
     function updateGame() {
         race.clear();
+        
+        player.speedX = 0;
+        player.speedY = 0;    
+        if (race.key) {
+            console.log(race.key);
+            if (race.key == 37) {
+                player.speedX = -3; 
+            }
+            if (race.key == 39) {
+                player.speedX = 3; 
+            }
+            if (race.key == 38) {
+                player.speedY = -3; 
+            }
+            if (race.key == 40) {
+                player.speedY = 3; 
+            }
+        }
+        player.move();
         player.update();
     }
 
@@ -31,18 +50,24 @@ canvas {
             this.context = this.canvas.getContext("2d");
             document.body.insertBefore(this.canvas, document.body.childNodes[0]);
             this.interval = setInterval(updateGame, 20);
-            window.addEventListener('mouseup', function (e) {
-                pool.x = e.pageX;
-                pool.y = e.pageY;
-                clickAction();
+            // window.addEventListener('mouseup', function (e) {
+            //     pool.x = e.pageX;
+            //     pool.y = e.pageY;
+            //     clickAction();
+            // })
+            // window.addEventListener('touchstart', function (e) {
+            //     pool.x = e.pageX;
+            //     pool.y = e.pageY;
+            // })
+            // window.addEventListener('touchend', function (e) {
+            //     pool.x = false;
+            //     pool.y = false;
+            // })
+            window.addEventListener('keydown', function (e) {
+                race.key = e.keyCode;
             })
-            window.addEventListener('touchstart', function (e) {
-                pool.x = e.pageX;
-                pool.y = e.pageY;
-            })
-            window.addEventListener('touchend', function (e) {
-                pool.x = false;
-                pool.y = false;
+            window.addEventListener('keyup', function (e) {
+                race.key = false;
             })
         },
         clear : function(){
@@ -74,8 +99,10 @@ canvas {
                 ctx.drawImage(step2, this.X, this.Y);
             }
             this.currentFrame += 1;
-            
-            ctx.drawImage(step1, 0, 0);
+        }
+        this.move = function() {
+            this.X += this.speedX;
+            this.Y += this.speedY;
         }
     }
 
