@@ -12,6 +12,7 @@ canvas {
 <body onload="startGame()">
 <script>
     var player;
+    var keys = [];
 
     function startGame() {
         race.start();
@@ -22,21 +23,18 @@ canvas {
         race.clear();
         
         player.speedX = 0;
-        player.speedY = 0;    
-        if (race.key) {
-            console.log(race.key);
-            if (race.key == 37) {
-                player.speedX = -3; 
-            }
-            if (race.key == 39) {
-                player.speedX = 3; 
-            }
-            if (race.key == 38) {
-                player.speedY = -3; 
-            }
-            if (race.key == 40) {
-                player.speedY = 3; 
-            }
+        player.speedY = 0;
+        if (keys[37]) {
+            player.speedX = -3; 
+        }
+        if (keys[39]) {
+            player.speedX = 3; 
+        }
+        if (keys[38]) {
+            player.speedY = -3; 
+        }
+        if (keys[40]) {
+            player.speedY = 3; 
         }
         player.move();
         player.update();
@@ -44,6 +42,7 @@ canvas {
 
     var race  = {
         canvas: document.createElement("canvas"),
+        keys: [],
         start: function() {
             this.canvas.width = 800;
             this.canvas.height = 600;
@@ -64,10 +63,10 @@ canvas {
             //     pool.y = false;
             // })
             window.addEventListener('keydown', function (e) {
-                race.key = e.keyCode;
+                keys[e.keyCode] = true;
             })
             window.addEventListener('keyup', function (e) {
-                race.key = false;
+                keys[e.keyCode] = false;
             })
         },
         clear : function(){
@@ -80,8 +79,9 @@ canvas {
         this.Y = y;
         this.speedX = 0;
         this.speedY = 0;
-        this.frameSpeed = 10;
+        this.frameSpeed = 15;
         this.currentFrame = 0;
+        this.isJumping = false;
         var step1 = new Image();
         var step2 = new Image();
         var idle = new Image();
@@ -90,9 +90,9 @@ canvas {
         idle.src = "./assets/images/turtleL.png";
         this.update = function() {
             ctx = race.context;
-            if (this.currentFrame >= 10) {
+            if (this.currentFrame >= this.frameSpeed) {
                 ctx.drawImage(step1, this.X, this.Y);
-                if (this.currentFrame >=20) {
+                if (this.currentFrame >= (2*this.frameSpeed)) {
                     this.currentFrame = 0;
                 }
             } else {
