@@ -58,8 +58,8 @@ canvas {
     var race  = {
         canvas: document.createElement("canvas"),
         start: function() {
-            this.canvas.width = 800;
-            this.canvas.height = 600;
+            this.canvas.width = 600;
+            this.canvas.height = 800;
             this.context = this.canvas.getContext("2d");
             document.body.insertBefore(this.canvas, document.body.childNodes[0]);
             this.interval = setInterval(updateGame, 20);
@@ -129,6 +129,7 @@ canvas {
         this.frameSpeed = 15;
         this.currentFrame = 0;
         this.isJumping = false;
+        this.flip = false;
         var step1 = new Image();
         var step2 = new Image();
         var idle = new Image();
@@ -137,6 +138,14 @@ canvas {
         idle.src = "./assets/images/turtleL.png";
         this.update = function() {
             ctx = race.context;
+            ctx.beginPath();
+            if (this.flip) {
+                step1.src = "./assets/images/turtleL.png";
+                step2.src = "./assets/images/turtleL.png";
+            } else {
+                step1.src = "./assets/images/turtleL2.png";
+                step2.src = "./assets/images/turtleL3.png";
+            }
             if (this.currentFrame >= this.frameSpeed) {
                 ctx.drawImage(step1, this.X, this.Y);
                 if (this.currentFrame >= (2*this.frameSpeed)) {
@@ -145,12 +154,20 @@ canvas {
             } else {
                 ctx.drawImage(step2, this.X, this.Y);
             }
+            ctx.closePath();
             this.currentFrame += 1;
         }
         this.move = function() {
+            if (keys[39]) {
+                this.flip = true;
+            }
+            if (keys[37]) {
+                this.flip = false;
+            }
             this.X += this.speedX;
             this.Y += this.speedY;
         }
+
     }
 
     function wall(w, h, x, y) {
