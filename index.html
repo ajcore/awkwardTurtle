@@ -108,7 +108,7 @@ canvas {
         this.Y = -1 * Math.floor(Math.random() * 300);
         this.width = Math.floor(Math.random() * 6);
         this.length = Math.floor(Math.random() * 100) + 50;
-        this.speed = Math.floor(Math.random() * 10);
+        this.speed = Math.floor(Math.random() * 6) + 5;
         this.color = getRandomColour();
 
         this.update = function() {
@@ -128,7 +128,7 @@ canvas {
                 this.X = Math.floor(Math.random() * race.canvas.width);
                 this.width = Math.floor(Math.random() * 6);
                 this.length = Math.floor(Math.random() * 100) + 50;
-                this.speed = Math.floor(Math.random() * 10);
+                this.speed = Math.floor(Math.random() * 6) + 5;
                 this.color = getRandomColour();
             } 
             this.Y += this.speed;
