@@ -6,6 +6,13 @@
 canvas {
     border: 1px solid #d3d3d3;
     background-color: #f1f1f1;
+    margin: auto;
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
 </style>
 </head>
@@ -29,7 +36,7 @@ canvas {
         for (var i =0; i < lineCount; i++) {
             lines.push(new backLine());
         }
-        console.log(lines.length);
+        
     }
 
     function updateGame() {
@@ -250,11 +257,10 @@ canvas {
             ctx.closePath();
             ctx.fillStyle="blue";
             ctx.fill();
-
-            this.move();
         }
 
         this.move = function() {
+            //fall and swoop to opposite side
             this.X -= this.speed;
         }
     }
