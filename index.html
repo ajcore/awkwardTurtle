@@ -25,6 +25,7 @@ canvas {
     var lines = [];
     var obstacles = [];
     var interval = 20;
+    var insta;
 
     function startGame() {
         race.start();
@@ -33,6 +34,7 @@ canvas {
         twit2 = new twitter(100, 200);
         obstacles.push(twit1);
         obstacles.push(twit2);
+        insta = new instagram();
 
         for (var i =0; i < lineCount; i++) {
             lines.push(new backLine());
@@ -69,12 +71,14 @@ canvas {
             obstacles[i].move();
             obstacles[i].update();
         }
+        insta.move();
+        insta.update();
     }
 
     var race  = {
         canvas: document.createElement("canvas"),
         start: function() {
-            this.canvas.width = 600;
+            this.canvas.width = 500;
             this.canvas.height = 800;
             this.context = this.canvas.getContext("2d");
             document.body.insertBefore(this.canvas, document.body.childNodes[0]);
@@ -340,6 +344,74 @@ canvas {
         }
     }
 
+    function instagram() {
+        this.X = race.canvas.width/2 - 50;
+        this.width = 100;
+        this.Y = -100;
+        this.height = 100;
+        this.durationCounter = 0;
+        var step = 1;
+        var blur = 100;
+
+        this.init = function() {
+            delayCounter = 0;
+            this.durationCounter= 0;
+            var blur = 100;
+            activate = true;
+        }
+
+        this.update = function() {
+            if (step >= 1) {
+                ctx = race.context;
+                ctx.beginPath();
+                var grd = ctx.createLinearGradient(this.X + this.width, this.Y, this.X, this.Y + this.height);
+                grd.addColorStop(0, "blue");
+                grd.addColorStop(0.4, "purple");
+                grd.addColorStop(0.6, "red");
+                grd.addColorStop(1, "yellow");
+                ctx.fillStyle = grd;
+                ctx.fillRect(this.X, this.Y, this.width, this.height);
+                ctx.closePath();
+                
+                ctx.beginPath();
+                ctx.fillStyle = "white";
+                ctx.arc(this.X + 20, this.Y + 20, 10, 0, 2 * Math.PI);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(this.X + 50, this.Y + 50, 25, 0, 2 * Math.PI);
+                ctx.closePath();
+                ctx.stroke();
+                if (step > 1) {
+                    ctx = race.context;
+                    ctx.beginPath();
+                    ctx.fillStyle = "white";
+                    ctx.fillRect(0, 0, race.canvas.width, race.canvas.height);
+                    ctx.closePath();
+                    this.durationCounter += 1;
+                    if (this.durationCounter > 20) {
+                        step = 0;
+                    }
+                }
+            } else {
+                ctx.filter = 'blur(' + blur + 'px)';
+                blur -= 1;
+            }
+        }
+
+        this.move = function() {
+            if (this.Y <= 25) {
+                this.Y += 4;
+            } else {
+                if (step != 0) {
+                    step += 1;
+                }
+            }
+        }
+
+
+    }
 </script>
 </body>
 </html>
