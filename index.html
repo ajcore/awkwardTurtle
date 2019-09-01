@@ -19,19 +19,20 @@ canvas {
 <body onload="startGame()">
 <script>
     var player;
-    var walls = [];
     //for logging what keys are pressed
     var keys = [];
     var lineCount = 50;
     var lines = [];
+    var obstacles = [];
+    var interval = 20;
 
     function startGame() {
         race.start();
         player = new turtle(100, 300);
         twit1 = new twitter(200,50);
         twit2 = new twitter(100, 200);
-        walls.push(twit1);
-        walls.push(twit2);
+        obstacles.push(twit1);
+        obstacles.push(twit2);
 
         for (var i =0; i < lineCount; i++) {
             lines.push(new backLine());
@@ -64,8 +65,9 @@ canvas {
         player.move();
         player.update();
 
-        for (var i=0; i < walls.length; i++) {
-            walls[i].update();
+        for (var i=0; i < obstacles.length; i++) {
+            obstacles[i].move();
+            obstacles[i].update();
         }
     }
 
@@ -76,7 +78,7 @@ canvas {
             this.canvas.height = 800;
             this.context = this.canvas.getContext("2d");
             document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-            this.interval = setInterval(updateGame, 20);
+            this.interval = setInterval(updateGame, interval);
             // window.addEventListener('mouseup', function (e) {
             //     pool.x = e.pageX;
             //     pool.y = e.pageY;
@@ -161,7 +163,6 @@ canvas {
             ctx.fillStyle = "green";
             ctx.fill();
             ctx.stroke();
-            
 
             ctx.beginPath();
             ctx.moveTo(this.X + 45, this.Y + 60);
@@ -249,19 +250,93 @@ canvas {
     function twitter(x, y) {
         this.X = x;
         this.Y = y;
-        this.speed = 1;
+        this.speedX = 3;
+        this.speedY = 1;
+        this.counter = 0;
+        this.wingUp = false;
+        //false = going left, true = going right
+        this.direction = false;
         this.update = function() {
             ctx = race.context;
-            ctx.beginPath();
-            ctx.rect(this.X, this.Y, this.width, this.height);
-            ctx.closePath();
-            ctx.fillStyle="blue";
-            ctx.fill();
+            //head and body
+            if (this.direction) {
+                ctx.beginPath();
+                ctx.moveTo(this.X+50, this.Y + 20);
+                ctx.bezierCurveTo(this.X + 50, this.Y, this.X + 30, this.Y, this.X + 30, this.Y + 20);
+                ctx.lineTo(this.X, this.Y + 20);
+                ctx.bezierCurveTo(this.X + 10, this.Y +50, this.X + 40, this.Y +50, this.X + 40, this.Y +20);
+                ctx.lineTo(this.X + 50, this.Y +20);
+                ctx.closePath();
+                ctx.fillStyle = "blue";
+                ctx.fill();
+                ctx.stroke();
+
+                //wings
+                if (this.wingUp) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.X + 30, this.Y + 20);
+                    ctx.bezierCurveTo(this.X + 20, this.Y + 30, this.X, this.Y + 10, this.X + 10, this.Y);
+                    ctx.closePath();
+                    ctx.fillStyle = "blue";
+                    ctx.fill();
+                    ctx.stroke();
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(this.X + 30, this.Y + 20);
+                    ctx.bezierCurveTo(this.X + 10, this.Y + 20, this.X + 10, this.Y + 40, this.X + 30, this.Y + 40);
+                    ctx.closePath();
+                    ctx.fillStyle = "blue";
+                    ctx.fill();
+                    ctx.stroke();
+                }
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(this.X, this.Y + 20);
+                ctx.bezierCurveTo(this.X, this.Y, this.X + 20, this.Y, this.X + 20, this.Y + 20);
+                ctx.lineTo(this.X + 50,this.Y + 20);
+                ctx.bezierCurveTo(this.X + 40, this.Y +50, this.X + 10, this.Y +50, this.X + 10, this.Y +20);
+                ctx.lineTo(this.X, this.Y +20);
+                ctx.closePath();
+                ctx.fillStyle = "blue";
+                ctx.fill();
+                ctx.stroke();
+
+                //wings
+                if (this.wingUp) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.X + 20, this.Y + 20);
+                    ctx.bezierCurveTo(this.X + 30, this.Y + 30, this.X + 50, this.Y + 10, this.X + 40, this.Y);
+                    ctx.closePath();
+                    ctx.fillStyle = "blue";
+                    ctx.fill();
+                    ctx.stroke();
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(this.X + 20, this.Y + 20);
+                    ctx.bezierCurveTo(this.X + 40, this.Y + 20, this.X + 40, this.Y + 40, this.X + 20, this.Y + 40);
+                    ctx.closePath();
+                    ctx.fillStyle = "blue";
+                    ctx.fill();
+                    ctx.stroke();
+                }
+            }
         }
 
         this.move = function() {
             //fall and swoop to opposite side
-            this.X -= this.speed;
+            if (this.X <= 0) {
+                this.direction = true;
+            }
+            if (this.X >= (race.canvas.width-50)) {
+                this.direction = false;
+            }
+            this.counter += 1;
+            if (this.counter >= 10) {
+                this.wingUp = !this.wingUp;
+                this.counter = 0;
+            }
+            this.X += this.direction? this.speedX : (-1 * this.speedX);
+            this.Y += this.speedY;
         }
     }
 
