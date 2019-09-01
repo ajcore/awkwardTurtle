@@ -15,7 +15,8 @@ canvas {
     var walls = [];
     //for logging what keys are pressed
     var keys = [];
-    var background1;
+    var lineCount = 50;
+    var lines = [];
 
     function startGame() {
         race.start();
@@ -24,12 +25,20 @@ canvas {
         twit2 = new twitter(100, 200);
         walls.push(twit1);
         walls.push(twit2);
-        background1 = new background();
+
+        for (var i =0; i < lineCount; i++) {
+            lines.push(new backLine());
+        }
+        console.log(lines.length);
     }
 
     function updateGame() {
         race.clear();
-        background1.update();
+        
+        for(var i = 0; i < lines.length; i++) {
+            lines[i].update();
+            lines[i].move();
+        }
 
         player.speedX = 0;
         player.speedY = 0;
@@ -81,26 +90,50 @@ canvas {
                 keys[e.keyCode] = false;
             })
         },
-        clear : function(){
+        clear: function(){
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         }
     }
 
-    function background(stripes) {
-        this.X = 0;
-        this.speed = 1;
-        this.numberOfStripes = stripes;
-        
+    function getRandomColour(){
+        var red = Math.floor(Math.random()* 255);
+        var green = Math.floor(Math.random() * 255);
+        var blue = Math.floor(Math.random() * 255);
+
+        return "rgb("+red+","+green+"," +blue+" )";  
+    }
+
+    function backLine() {
+        this.X = Math.floor(Math.random() * race.canvas.width);
+        this.Y = -1 * Math.floor(Math.random() * 300);
+        this.width = Math.floor(Math.random() * 6);
+        this.length = Math.floor(Math.random() * 100) + 50;
+        this.speed = Math.floor(Math.random() * 10);
+        this.color = getRandomColour();
+
         this.update = function() {
             ctx = race.context;
             ctx.beginPath();
-            ctx.rect(0,0,race.canvas.width, race.canvas.height);
+            ctx.strokeStyle = this.color;
+            ctx.moveTo(this.X, this.Y);
+            ctx.lineWidth = this.width;
+            ctx.lineTo(this.X, this.Y - this.length);
             ctx.closePath();
-            ctx.fillStyle = "black";
-            ctx.fill();
+            ctx.stroke();
+        }
+
+        this.move = function() {
+            if (this.Y > (race.canvas.height + this.length)) {
+                this.Y = -1 * Math.floor(Math.random() * 300);
+                this.X = Math.floor(Math.random() * race.canvas.width);
+                this.width = Math.floor(Math.random() * 6);
+                this.length = Math.floor(Math.random() * 100) + 50;
+                this.speed = Math.floor(Math.random() * 10);
+                this.color = getRandomColour();
+            } 
+            this.Y += this.speed;
         }
     }
-
 
     function turtle(x, y) {
         this.X = x;
