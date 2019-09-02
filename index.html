@@ -21,75 +21,103 @@ canvas {
     var player;
     //for logging what keys are pressed
     var keys = [];
-    var lineCount = 50;
+    var lineCount;
     var lines = [];
-    var tweetCount = 0;
-    var tweetSpawn = 100;
+    var tweetCount;
+    var tweetSpawn;
     var tweets = [];
-    var facebookSpawn = 50;
-    var facebookCount = 3;
+    var facebookSpawn;
+    var facebookCount;
     var facebooks = [];
-    var instaSpeed = 2500;
-    var instaCounter = 0;
+    var instaSpeed;
+    var instaCounter;
     var insta;
-    var interval = 20;
-    var score = 0;
+    var interval;
+    var finalScore;
+    var score;
     var board;
+    var over = false;
 
     function startGame() {
         race.start();
+        initialize();
+    }
+
+    function initialize() {
+        score = 0;
+        finalScore = 0;
+        lineCount = 50;
+        tweetCount = 0;
+        tweetSpawn = 100;
+        facebookSpawn = 50;
+        facebookCount = 3;
+        instaSpeed = 2500;
+        instaCounter = 0;
+        interval = 60;
         player = new turtle(race.canvas.width/2 - 50, race.canvas.height - 250);
         insta = new instagram();
         board = new scoreBoard();
-        for (var i =0; i < lineCount; i++) {
-            lines.push(new backLine());
+        if (lines.length <= lineCount) {
+            for (var i = 0; i < lineCount; i++) {
+                lines.push(new backLine());
+            }
         }
     }
 
     function updateGame() {
-        race.clear();
         
+        race.clear();
         for(var i = 0; i < lines.length; i++) {
             lines[i].update();
             lines[i].move();
         }
-
-        player.speedX = 0;
-        player.speedY = 0;
-        if (keys[37]) {
-            player.speedX = -7; 
-        }
-        if (keys[39]) {
-            player.speedX = 7; 
-        }
-        if (keys[38]) {
-            player.speedY = -7; 
-        }
-        if (keys[40]) {
-            player.speedY = 7; 
-        }
-        player.move();
-        player.update();
-
-        if (!insta.finished()) {
-            insta.move();
-            insta.update();
-        }
-        for (var i = 0; i < tweets.length; i++) {
-            while (tweets[i].finished()) {
-                tweets.splice(i,1);
+        if (!over) {
+            player.speedX = 0;
+            player.speedY = 0;
+            if (keys[37]) {
+                player.speedX = 7; 
             }
+            if (keys[39]) {
+                player.speedX = -7; 
+            }
+            if (keys[38]) {
+                player.speedY = 7; 
+            }
+            if (keys[40]) {
+                player.speedY = -7; 
+            }
+            player.move();
+            player.update();
+
+            if (!insta.finished()) {
+                insta.move();
+                insta.update();
+            }
+            for (var i = 0; i < tweets.length; i++) {
+                while (tweets[i].finished()) {
+                    tweets.splice(i,1);
+                }
+
                 tweets[i].move();
                 tweets[i].update();
-            
-        }
-        score += 1;
-        
-        board.update();
+                if (tweets[i].hit()) {
+                    over = true;
+                }
+            }
+            score += 1;
+            board.update();
 
-        // facebookDificulty();
-        twitterDifficulty();
-        instagramDifficulty();
+            // facebookDificulty();
+            twitterDifficulty();
+            instagramDifficulty();
+        } else {
+            gameOver();
+            if (keys[32]) {
+                //reinitialize
+                initialize();
+                over = false;
+            }
+        }
     }
 
     // function facebookDificulty() {
@@ -99,6 +127,25 @@ canvas {
     //     //increase count
     //     facebookCount = score/5;
     // }
+
+    function gameOver() {
+        console.log("Game Over");
+        tweets = [];
+        insta = null;
+        player = null;
+        board = null;
+        if (finalScore == 0) {
+            finalScore = score;
+        }
+
+        //draw gameover
+        ctx = race.context;
+        ctx.font = "60px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("GAME OVER", race.canvas.width/2, race.canvas.height/2); 
+        ctx.font = "30px Arial";
+        ctx.fillText(finalScore, race.canvas.width/2, race.canvas.height/2 + 50);         
+    }
 
     function twitterDifficulty() {
         while(tweetCount > tweets.length) {
@@ -199,8 +246,6 @@ canvas {
         this.speedY = 0;
         this.frameSpeed = 15;
         this.currentFrame = 0;
-        this.isJumping = false;
-        this.flip = false;
         this.update = function() {
             ctx = race.context;
             ctx.beginPath();
@@ -291,11 +336,15 @@ canvas {
             ctx.stroke();
 
         }
-        this.move = function() {
-            this.X += this.speedX;
-            this.Y += this.speedY;
-        }
 
+        this.move = function() {
+            if (!(this.speedX < 0 && this.X <= 0) && !(this.speedX > 0 && this.X >= (race.canvas.width-50))) {
+                this.X += this.speedX;
+            }
+            if (!(this.speedY < 0 && this.Y <= 5) && !(this.speedY > 0 && this.Y >= (race.canvas.height-55))) {
+                this.Y += this.speedY;
+            }
+        }
     }
 
     function scoreBoard() {
@@ -311,8 +360,8 @@ canvas {
         this.X = Math.floor(Math.random() * race.canvas.width) - 49;
         
         this.Y = -1 * Math.floor(Math.random() * 100);
-        this.speedX = Math.floor(Math.random() * 4) + 3;
-        this.speedY = Math.floor(Math.random() * 5) + 1;
+        this.speedX = Math.floor(Math.random() * 4);
+        this.speedY = Math.floor(Math.random() * 3) + 1;
         this.counter = 0;
         this.wingUp = false;
         //false = going left, true = going right
@@ -321,8 +370,8 @@ canvas {
         this.init = function() {
             this.X = Math.floor(Math.random() * race.canvas.width) - 49;
             this.Y = -1 * Math.floor(Math.random() * 100);
-            this.speedX = Math.floor(Math.random() * 4) + 3;
-            this.speedY = Math.floor(Math.random() * 5) + 1;
+            this.speedX = Math.floor(Math.random() * 4);
+            this.speedY = Math.floor(Math.random() * 3) + 1;
             this.counter = 0;
             this.wingUp = false;
             //false = going left, true = going right
@@ -410,6 +459,16 @@ canvas {
             }
             this.X += this.direction? this.speedX : (-1 * this.speedX);
             this.Y += this.speedY;
+        }
+
+        this.hit = function() {
+            if (this.X < player.X + 50 &&
+                this.X + 50 > player.X &&
+                this.Y < player.Y + 50 &&
+                this.Y + 50 > player.Y) {
+                console.log("Hit the player!");
+                return true;
+            } else return false;
         }
 
         this.finished = function() {
