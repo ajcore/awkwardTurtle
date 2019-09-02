@@ -6,32 +6,49 @@
 canvas {
     border: 1px solid #d3d3d3;
     background-color: #f1f1f1;
+    margin: auto;
+    display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }
 </style>
 </head>
 <body onload="startGame()">
 <script>
     var player;
-    var walls = [];
     //for logging what keys are pressed
     var keys = [];
-    var background1;
+    var lineCount = 50;
+    var lines = [];
+    var obstacles = [];
+    var interval = 20;
+    var insta;
 
     function startGame() {
         race.start();
         player = new turtle(100, 300);
-        // wall1 = new wall(200,50, 500, 20);
-        // wall2 = new wall(200,50, 1000, 200);
-        // walls.push(wall1);
-        // walls.push(wall2);
-        background1 = new background(50);
+        twit1 = new twitter(200,50);
+        twit2 = new twitter(100, 200);
+        obstacles.push(twit1);
+        obstacles.push(twit2);
+        insta = new instagram();
+
+        for (var i =0; i < lineCount; i++) {
+            lines.push(new backLine());
+        }
+        
     }
 
     function updateGame() {
         race.clear();
         
-        background1.move();
-        background1.update();
+        for(var i = 0; i < lines.length; i++) {
+            lines[i].update();
+            lines[i].move();
+        }
 
         player.speedX = 0;
         player.speedY = 0;
@@ -50,19 +67,22 @@ canvas {
         player.move();
         player.update();
 
-        for (var i=0; i < walls.length; i++) {
-            walls[i].update();
+        for (var i=0; i < obstacles.length; i++) {
+            obstacles[i].move();
+            obstacles[i].update();
         }
+        insta.move();
+        insta.update();
     }
 
     var race  = {
         canvas: document.createElement("canvas"),
         start: function() {
-            this.canvas.width = 600;
+            this.canvas.width = 500;
             this.canvas.height = 800;
             this.context = this.canvas.getContext("2d");
             document.body.insertBefore(this.canvas, document.body.childNodes[0]);
-            this.interval = setInterval(updateGame, 20);
+            this.interval = setInterval(updateGame, interval);
             // window.addEventListener('mouseup', function (e) {
             //     pool.x = e.pageX;
             //     pool.y = e.pageY;
@@ -83,43 +103,50 @@ canvas {
                 keys[e.keyCode] = false;
             })
         },
-        clear : function(){
+        clear: function(){
             this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         }
     }
 
-    function background(stripes) {
-        this.X = 0;
-        this.speed = 1;
-        this.numberOfStripes = stripes;
-        
-        this.update = function() {
-            ctx = race.context;
-            
-            var color1 = "#F2EEB3"; //light
-            var color2="#CCC897"; //dark
-            for (var i=0;i<this.numberOfStripes*3;i++){
-                var thickness = race.canvas.width / this.numberOfStripes;
-                ctx.beginPath();
-                ctx.strokeStyle = i % 2?color1:color2;
-                ctx.lineWidth =thickness;
-                ctx.lineCap = 'round';
-                
-                ctx.moveTo(i*thickness + thickness/2 - race.canvas.width + this.X,0);
-                ctx.lineTo(this.X + i*thickness+thickness/2,race.canvas.width);
-                ctx.stroke();
-                ctx.closePath();
-            }
-           
-        }
-        this.move = function () {
-            this.X -= this.speed;
-            if (this.X <= (-1* this.numberOfStripes*3)) {
-                this.X = 0;
-            }
-        }
+    function getRandomColour(){
+        var red = Math.floor(Math.random()* 255);
+        var green = Math.floor(Math.random() * 255);
+        var blue = Math.floor(Math.random() * 255);
+
+        return "rgb("+red+","+green+"," +blue+" )";  
     }
 
+    function backLine() {
+        this.X = Math.floor(Math.random() * race.canvas.width);
+        this.Y = -1 * Math.floor(Math.random() * 300);
+        this.width = Math.floor(Math.random() * 6);
+        this.length = Math.floor(Math.random() * 100) + 50;
+        this.speed = Math.floor(Math.random() * 6) + 5;
+        this.color = getRandomColour();
+
+        this.update = function() {
+            ctx = race.context;
+            ctx.beginPath();
+            ctx.strokeStyle = this.color;
+            ctx.moveTo(this.X, this.Y);
+            ctx.lineWidth = this.width;
+            ctx.lineTo(this.X, this.Y - this.length);
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        this.move = function() {
+            if (this.Y > (race.canvas.height + this.length)) {
+                this.Y = -1 * Math.floor(Math.random() * 300);
+                this.X = Math.floor(Math.random() * race.canvas.width);
+                this.width = Math.floor(Math.random() * 6);
+                this.length = Math.floor(Math.random() * 100) + 50;
+                this.speed = Math.floor(Math.random() * 6) + 5;
+                this.color = getRandomColour();
+            } 
+            this.Y += this.speed;
+        }
+    }
 
     function turtle(x, y) {
         this.X = x;
@@ -130,66 +157,261 @@ canvas {
         this.currentFrame = 0;
         this.isJumping = false;
         this.flip = false;
-        var step1 = new Image();
-        var step2 = new Image();
-        var idle = new Image();
-        step1.src = "./assets/images/turtleL2.png";
-        step2.src = "./assets/images/turtleL3.png";
-        idle.src = "./assets/images/turtleL.png";
         this.update = function() {
             ctx = race.context;
+            //back legs
             ctx.beginPath();
-            if (this.flip) {
-                step1.src = "./assets/images/turtleL.png";
-                step2.src = "./assets/images/turtleL.png";
-            } else {
-                step1.src = "./assets/images/turtleL2.png";
-                step2.src = "./assets/images/turtleL3.png";
-            }
-            if (this.currentFrame >= this.frameSpeed) {
-                ctx.drawImage(step1, this.X, this.Y);
-                if (this.currentFrame >= (2*this.frameSpeed)) {
-                    this.currentFrame = 0;
-                }
-            } else {
-                ctx.drawImage(step2, this.X, this.Y);
-            }
+            ctx.moveTo(this.X + 15, this.Y + 45);
+            ctx.bezierCurveTo(this.X + 15, this.Y + 40, this.X, this.Y +30, this.X, this.Y + 50);
             ctx.closePath();
-            this.currentFrame += 1;
+            ctx.fillStyle = "green";
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(this.X + 45, this.Y + 60);
+            ctx.bezierCurveTo(this.X + 5, this.Y + 75,this. X + 5, this.Y + 90, this.X + 15, this.Y + 90);
+            ctx.closePath();
+            ctx.fillStyle = "green";
+            ctx.fill();
+            ctx.stroke();
+
+            //back shell
+            ctx.beginPath();
+            ctx.moveTo(this.X + 30, this.Y + 30);
+            ctx.bezierCurveTo(this.X + 65,this.Y + 30,this.X + 65,this.Y + 70,this.X + 50, this.Y + 70);
+            ctx.bezierCurveTo(this.X + 55, this.Y +70,this.X + 55,this.Y + 30,this.X + 30,this.Y + 30);
+            ctx.closePath();
+
+            ctx.fillStyle="brown";
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(this.X +30,this.Y + 30);
+            ctx.bezierCurveTo(this.X + 55,this.Y + 30,this.X + 55,this.Y + 70,this.X + 50,this.Y + 70);
+            ctx.bezierCurveTo(this.X + 50, this.Y + 80,this.X + 15, this.Y + 80,this.X +15,this.Y +70);
+            ctx.bezierCurveTo(this.X + 10,this.Y + 70,this.X + 10,this.Y + 35,this.X + 15,this.Y + 35);
+            ctx.bezierCurveTo(this.X + 15,this.Y + 30,this.X + 35, this.Y + 30, this.X + 35, this.Y + 35);
+            ctx.closePath();
+
+            ctx.fillStyle="#f0e5c7";
+            ctx.fill();
+            ctx.stroke();
+
+            //front legs
+            ctx.beginPath();
+            ctx.moveTo(this.X + 25, this.Y + 40);
+            ctx.bezierCurveTo(this.X + 25, this.Y + 50, this.X + 45, this.Y + 50, this.X + 45, this.Y + 40);
+            ctx.closePath();
+            ctx.fillStyle = "green";
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(this.X + 45,this.Y + 70);
+            ctx.bezierCurveTo(this.X + 35, this.Y + 80, this.X + 50, this.Y + 90, this.X + 55, this.Y + 80);
+            ctx.closePath();
+            ctx.fillStyle = "green";
+            ctx.fill();
+            ctx.stroke();
+
+            //head
+            ctx.beginPath();
+            ctx.moveTo(this.X + 20, this.Y + 10);
+            ctx.lineTo(this.X + 20, this.Y + 30);
+            ctx.bezierCurveTo(this.X + 20, this.Y + 35, this.X + 30, this.Y + 35, this.X + 30, this.Y + 30);
+            ctx.lineTo(this.X + 30, this.Y + 25);
+            ctx.bezierCurveTo(this.X + 30, this.Y + 20, this.X + 35, this.Y + 20, this.X + 35, this.Y + 20);
+            ctx.bezierCurveTo(this.X + 50, this.Y + 20, this.X + 50, this.Y, this.X + 35, this.Y);
+            ctx.bezierCurveTo(this.X + 20, this.Y, this.X + 20, this.Y + 10, this.X + 20, this.Y + 10);
+            ctx.closePath();
+
+            ctx.fillStyle="green";
+            ctx.fill();
+            ctx.stroke();
+
+            //eyes
+            ctx.beginPath();
+            ctx.rect(this.X + 30, this.Y + 5, 2, 5);
+            ctx.closePath();
+            ctx.fillStyle="black";
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.rect(this.X + 40, this.Y + 5, 2, 5);
+            ctx.closePath();
+            ctx.fillStyle="black";
+            ctx.fill();
         }
         this.move = function() {
-            if (keys[39]) {
-                this.flip = true;
-            }
-            if (keys[37]) {
-                this.flip = false;
-            }
             this.X += this.speedX;
             this.Y += this.speedY;
         }
 
     }
 
-    function wall(w, h, x, y) {
-        this.width = w;
-        this.height = h;
+    function twitter(x, y) {
         this.X = x;
         this.Y = y;
-        this.speed = 1;
+        this.speedX = 3;
+        this.speedY = 1;
+        this.counter = 0;
+        this.wingUp = false;
+        //false = going left, true = going right
+        this.direction = false;
         this.update = function() {
             ctx = race.context;
-            ctx.beginPath();
-            ctx.rect(this.X, this.Y, this.width, this.height);
-            ctx.stroke();
-            this.move();
-            ctx.closePath();
+            //head and body
+            if (this.direction) {
+                ctx.beginPath();
+                ctx.moveTo(this.X+50, this.Y + 20);
+                ctx.bezierCurveTo(this.X + 50, this.Y, this.X + 30, this.Y, this.X + 30, this.Y + 20);
+                ctx.lineTo(this.X, this.Y + 20);
+                ctx.bezierCurveTo(this.X + 10, this.Y +50, this.X + 40, this.Y +50, this.X + 40, this.Y +20);
+                ctx.lineTo(this.X + 50, this.Y +20);
+                ctx.closePath();
+                ctx.fillStyle = "blue";
+                ctx.fill();
+                ctx.stroke();
+
+                //wings
+                if (this.wingUp) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.X + 30, this.Y + 20);
+                    ctx.bezierCurveTo(this.X + 20, this.Y + 30, this.X, this.Y + 10, this.X + 10, this.Y);
+                    ctx.closePath();
+                    ctx.fillStyle = "blue";
+                    ctx.fill();
+                    ctx.stroke();
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(this.X + 30, this.Y + 20);
+                    ctx.bezierCurveTo(this.X + 10, this.Y + 20, this.X + 10, this.Y + 40, this.X + 30, this.Y + 40);
+                    ctx.closePath();
+                    ctx.fillStyle = "blue";
+                    ctx.fill();
+                    ctx.stroke();
+                }
+            } else {
+                ctx.beginPath();
+                ctx.moveTo(this.X, this.Y + 20);
+                ctx.bezierCurveTo(this.X, this.Y, this.X + 20, this.Y, this.X + 20, this.Y + 20);
+                ctx.lineTo(this.X + 50,this.Y + 20);
+                ctx.bezierCurveTo(this.X + 40, this.Y +50, this.X + 10, this.Y +50, this.X + 10, this.Y +20);
+                ctx.lineTo(this.X, this.Y +20);
+                ctx.closePath();
+                ctx.fillStyle = "blue";
+                ctx.fill();
+                ctx.stroke();
+
+                //wings
+                if (this.wingUp) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.X + 20, this.Y + 20);
+                    ctx.bezierCurveTo(this.X + 30, this.Y + 30, this.X + 50, this.Y + 10, this.X + 40, this.Y);
+                    ctx.closePath();
+                    ctx.fillStyle = "blue";
+                    ctx.fill();
+                    ctx.stroke();
+                } else {
+                    ctx.beginPath();
+                    ctx.moveTo(this.X + 20, this.Y + 20);
+                    ctx.bezierCurveTo(this.X + 40, this.Y + 20, this.X + 40, this.Y + 40, this.X + 20, this.Y + 40);
+                    ctx.closePath();
+                    ctx.fillStyle = "blue";
+                    ctx.fill();
+                    ctx.stroke();
+                }
+            }
         }
 
         this.move = function() {
-            this.X -= this.speed;
+            //fall and swoop to opposite side
+            if (this.X <= 0) {
+                this.direction = true;
+            }
+            if (this.X >= (race.canvas.width-50)) {
+                this.direction = false;
+            }
+            this.counter += 1;
+            if (this.counter >= 10) {
+                this.wingUp = !this.wingUp;
+                this.counter = 0;
+            }
+            this.X += this.direction? this.speedX : (-1 * this.speedX);
+            this.Y += this.speedY;
         }
     }
 
+    function instagram() {
+        this.X = race.canvas.width/2 - 50;
+        this.width = 100;
+        this.Y = -100;
+        this.height = 100;
+        this.durationCounter = 0;
+        var step = 1;
+        var blur = 100;
+
+        this.init = function() {
+            delayCounter = 0;
+            this.durationCounter= 0;
+            var blur = 100;
+            activate = true;
+        }
+
+        this.update = function() {
+            if (step >= 1) {
+                ctx = race.context;
+                ctx.beginPath();
+                var grd = ctx.createLinearGradient(this.X + this.width, this.Y, this.X, this.Y + this.height);
+                grd.addColorStop(0, "blue");
+                grd.addColorStop(0.4, "purple");
+                grd.addColorStop(0.6, "red");
+                grd.addColorStop(1, "yellow");
+                ctx.fillStyle = grd;
+                ctx.fillRect(this.X, this.Y, this.width, this.height);
+                ctx.closePath();
+                
+                ctx.beginPath();
+                ctx.fillStyle = "white";
+                ctx.arc(this.X + 20, this.Y + 20, 10, 0, 2 * Math.PI);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(this.X + 50, this.Y + 50, 25, 0, 2 * Math.PI);
+                ctx.closePath();
+                ctx.stroke();
+                if (step > 1) {
+                    ctx = race.context;
+                    ctx.beginPath();
+                    ctx.fillStyle = "white";
+                    ctx.fillRect(0, 0, race.canvas.width, race.canvas.height);
+                    ctx.closePath();
+                    this.durationCounter += 1;
+                    if (this.durationCounter > 20) {
+                        step = 0;
+                    }
+                }
+            } else {
+                ctx.filter = 'blur(' + blur + 'px)';
+                blur -= 1;
+            }
+        }
+
+        this.move = function() {
+            if (this.Y <= 25) {
+                this.Y += 4;
+            } else {
+                if (step != 0) {
+                    step += 1;
+                }
+            }
+        }
+
+
+    }
 </script>
 </body>
 </html>
