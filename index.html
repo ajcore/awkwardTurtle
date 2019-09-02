@@ -25,16 +25,20 @@ canvas {
     var lines = [];
     var obstacles = [];
     var interval = 20;
+    var fb;
     var insta;
+    
 
     function startGame() {
         race.start();
         player = new turtle(100, 300);
         twit1 = new twitter(200,50);
         twit2 = new twitter(100, 200);
+        fb = new facebook(100, 50);
         obstacles.push(twit1);
         obstacles.push(twit2);
         insta = new instagram();
+        
 
         for (var i =0; i < lineCount; i++) {
             lines.push(new backLine());
@@ -73,6 +77,9 @@ canvas {
         }
         insta.move();
         insta.update();
+
+        fb.move();
+        fb.update();
     }
 
     var race  = {
@@ -344,6 +351,30 @@ canvas {
         }
     }
 
+function facebook(x, y) {
+        this.X = x;
+        this.Y = y;
+        this.speedX = 2;
+        this.speedY = 1;
+        var step = 1;
+
+        this.update = function() {
+            if (step >= 1) {
+            ctx = race.context;
+            ctx.fillStyle = "blue";
+            ctx.beginPath();
+            ctx.arc(this.x + 100, this.y + 75, 50, 0, 2 * Math.PI);
+            ctx.closePath();
+            ctx.stroke();  
+            ctx.fill();
+            }
+        }
+
+        this.move = function() {
+            this.y += this.speedY;
+        }
+
+}
     function instagram() {
         this.X = race.canvas.width/2 - 50;
         this.width = 100;
