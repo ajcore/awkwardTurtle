@@ -57,7 +57,7 @@ canvas {
         player = new turtle(race.canvas.width/2 - 50, race.canvas.height - 250);
         insta = new instagram();
         board = new scoreBoard();
-        if (lines.length <= lineCount) {
+        if (lines.length < lineCount) {
             for (var i = 0; i < lineCount; i++) {
                 lines.push(new backLine());
             }
@@ -75,16 +75,16 @@ canvas {
             player.speedX = 0;
             player.speedY = 0;
             if (keys[37]) {
-                player.speedX = 7; 
+                player.speedX = 5; 
             }
             if (keys[39]) {
-                player.speedX = -7; 
+                player.speedX = -5; 
             }
             if (keys[38]) {
-                player.speedY = 7; 
+                player.speedY = 5; 
             }
             if (keys[40]) {
-                player.speedY = -7; 
+                player.speedY = -5; 
             }
             player.move();
             player.update();
@@ -127,6 +127,14 @@ canvas {
     //     //increase count
     //     facebookCount = score/5;
     // }
+    
+    function startScreen() {
+        ctx.race.context;
+        ctx.font = "60px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Awkward", race.canvas.width/2, race.canvas.height/2);
+        ctx.fillText("Turtle", race.canvas.width/2, race.canvas.height/2); 
+    }
 
     function gameOver() {
         console.log("Game Over");
@@ -152,7 +160,7 @@ canvas {
             console.log("created a tweet");
             tweets.push(new twitter());
         }
-        tweetCount = score/100;
+        tweetCount = score/500;
     }
 
     function instagramDifficulty() {
@@ -212,7 +220,7 @@ canvas {
         this.Y = -1 * Math.floor(Math.random() * 300);
         this.width = Math.floor(Math.random() * 6);
         this.length = Math.floor(Math.random() * 100) + 50;
-        this.speed = Math.floor(Math.random() * 6) + 5;
+        this.speed = Math.floor(Math.random() * 5) + 1;
         this.color = getRandomColour();
 
         this.update = function() {
@@ -232,7 +240,7 @@ canvas {
                 this.X = Math.floor(Math.random() * race.canvas.width);
                 this.width = Math.floor(Math.random() * 6);
                 this.length = Math.floor(Math.random() * 100) + 50;
-                this.speed = Math.floor(Math.random() * 6) + 5;
+                this.speed = Math.floor(Math.random() * 5) + 1;
                 this.color = getRandomColour();
             } 
             this.Y += this.speed;
@@ -350,6 +358,7 @@ canvas {
     function scoreBoard() {
         this.update = function() {
             ctx = race.context;
+            ctx.textAlign = "left";
             ctx.font = "30px Arial";
             ctx.fillText(score, 10, 30); 
         }
@@ -358,10 +367,9 @@ canvas {
     function twitter() {
         //49 because random returns 0 to 1 less than the width
         this.X = Math.floor(Math.random() * race.canvas.width) - 49;
-        
         this.Y = -1 * Math.floor(Math.random() * 100);
-        this.speedX = Math.floor(Math.random() * 4);
-        this.speedY = Math.floor(Math.random() * 3) + 1;
+        this.speedX = Math.floor(Math.random() * 3);
+        this.speedY = Math.floor(Math.random() * 2) + 1;
         this.counter = 0;
         this.wingUp = false;
         //false = going left, true = going right
@@ -370,8 +378,8 @@ canvas {
         this.init = function() {
             this.X = Math.floor(Math.random() * race.canvas.width) - 49;
             this.Y = -1 * Math.floor(Math.random() * 100);
-            this.speedX = Math.floor(Math.random() * 4);
-            this.speedY = Math.floor(Math.random() * 3) + 1;
+            this.speedX = Math.floor(Math.random() * 3);
+            this.speedY = Math.floor(Math.random() * 2) + 1;
             this.counter = 0;
             this.wingUp = false;
             //false = going left, true = going right
