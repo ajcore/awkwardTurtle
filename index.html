@@ -36,6 +36,7 @@ canvas {
     var finalScore;
     var score;
     var board;
+    var start = true;
     var over = false;
 
     function startGame() {
@@ -65,57 +66,70 @@ canvas {
     }
 
     function updateGame() {
-        
         race.clear();
         for(var i = 0; i < lines.length; i++) {
             lines[i].update();
             lines[i].move();
         }
-        if (!over) {
-            player.speedX = 0;
-            player.speedY = 0;
-            if (keys[37]) {
-                player.speedX = 5; 
-            }
-            if (keys[39]) {
-                player.speedX = -5; 
-            }
-            if (keys[38]) {
-                player.speedY = 5; 
-            }
-            if (keys[40]) {
-                player.speedY = -5; 
-            }
-            player.move();
-            player.update();
-
-            if (!insta.finished()) {
-                insta.move();
-                insta.update();
-            }
-            for (var i = 0; i < tweets.length; i++) {
-                while (tweets[i].finished()) {
-                    tweets.splice(i,1);
-                }
-
-                tweets[i].move();
-                tweets[i].update();
-                if (tweets[i].hit()) {
-                    over = true;
-                }
-            }
-            score += 1;
-            board.update();
-
-            // facebookDificulty();
-            twitterDifficulty();
-            instagramDifficulty();
-        } else {
-            gameOver();
+        if (start) {
+            startScreen();
             if (keys[32]) {
                 //reinitialize
+                start = false;
                 initialize();
                 over = false;
+            }
+        }
+        else {
+            if (!over) {
+                player.speedX = 0;
+                player.speedY = 0;
+                if (keys[37]) {
+                    player.speedX = 5; 
+                }
+                if (keys[39]) {
+                    player.speedX = -5; 
+                }
+                if (keys[38]) {
+                    player.speedY = 5; 
+                }
+                if (keys[40]) {
+                    player.speedY = -5; 
+                }
+                player.move();
+                player.update();
+
+                if (!insta.finished()) {
+                    insta.move();
+                    insta.update();
+                }
+                for (var i = 0; i < tweets.length; i++) {
+                    while (tweets[i].finished()) {
+                        tweets.splice(i,1);
+                        if (i >= tweets.length) {
+                            break;
+                        }
+                    }
+
+                    tweets[i].move();
+                    tweets[i].update();
+                    if (tweets[i].hit()) {
+                        over = true;
+                    }
+                }
+                score += 1;
+                board.update();
+
+                // facebookDificulty();
+                twitterDifficulty();
+                instagramDifficulty();
+            } else {
+                gameOver();
+                if (keys[32]) {
+                    //reinitialize
+                    initialize();
+                    over = false;
+                }
             }
         }
     }
@@ -129,15 +143,14 @@ canvas {
     // }
     
     function startScreen() {
-        ctx.race.context;
+        ctx = race.context;
         ctx.font = "60px Arial";
         ctx.textAlign = "center";
-        ctx.fillText("Awkward", race.canvas.width/2, race.canvas.height/2);
-        ctx.fillText("Turtle", race.canvas.width/2, race.canvas.height/2); 
+        ctx.fillText("Awkward", race.canvas.width/2, race.canvas.height/2 - 30);
+        ctx.fillText("Turtle", race.canvas.width/2, race.canvas.height/2 + 30); 
     }
 
     function gameOver() {
-        console.log("Game Over");
         tweets = [];
         insta = null;
         player = null;
@@ -157,7 +170,6 @@ canvas {
 
     function twitterDifficulty() {
         while(tweetCount > tweets.length) {
-            console.log("created a tweet");
             tweets.push(new twitter());
         }
         tweetCount = score/500;
@@ -493,7 +505,7 @@ canvas {
         this.height = 100;
         this.durationCounter = 0;
         var step = -1;
-        var blur = 100;
+        this.blur = 100;
 
         this.init = function() {
             this.durationCounter = 0;
@@ -536,9 +548,9 @@ canvas {
                     }
                 }
             } else if (step == 0){
-                ctx.filter = 'blur(' + blur + 'px)';
-                blur -= 1;
-                if (blur == 0) {
+                this.blur -= 1;
+                race.canvas.style.webkitFilter = 'blur(' + this.blur + 'px)';
+                if (this.blur == 0) {
                     step = -1;
                 }
             }
