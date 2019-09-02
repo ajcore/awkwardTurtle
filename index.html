@@ -24,7 +24,9 @@ canvas {
     var lineCount = 50;
     var lines = [];
     var tweetCount = 0;
+    var tweetSpawn = 100;
     var tweets = [];
+    var facebookSpawn = 50;
     var facebookCount = 3;
     var facebooks = [];
     var instaSpeed = 2500;
@@ -32,16 +34,16 @@ canvas {
     var insta;
     var interval = 20;
     var score = 0;
+    var board;
 
     function startGame() {
         race.start();
         player = new turtle(race.canvas.width/2 - 50, race.canvas.height - 250);
         insta = new instagram();
-
+        board = new scoreBoard();
         for (var i =0; i < lineCount; i++) {
             lines.push(new backLine());
         }
-        
     }
 
     function updateGame() {
@@ -73,15 +75,18 @@ canvas {
             insta.move();
             insta.update();
         }
-
         for (var i = 0; i < tweets.length; i++) {
+            while (tweets[i].finished()) {
+                tweets.splice(i,1);
+            }
                 tweets[i].move();
                 tweets[i].update();
             
         }
-
         score += 1;
-        scoreBoard();
+        
+        board.update();
+
         // facebookDificulty();
         twitterDifficulty();
         instagramDifficulty();
@@ -198,90 +203,93 @@ canvas {
         this.flip = false;
         this.update = function() {
             ctx = race.context;
-            //back legs
             ctx.beginPath();
-            ctx.moveTo(this.X + 15, this.Y + 45);
-            ctx.bezierCurveTo(this.X + 15, this.Y + 40, this.X, this.Y +30, this.X, this.Y + 50);
+            ctx.moveTo(this.X + 25, this.Y + 5);
+            ctx.bezierCurveTo(this.X + 50, this.Y + 5, this.X + 50, this.Y + 50, this.X + 25, this.Y + 50);
+            ctx.bezierCurveTo(this.X, this.Y + 50, this.X, this.Y + 5, this.X + 25, this.Y + 5);
             ctx.closePath();
-            ctx.fillStyle = "green";
+            ctx.fillStyle = "brown";
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(this.X + 25, this.Y + 10);
+            ctx.bezierCurveTo(this.X + 45, this.Y + 10, this.X + 45, this.Y + 45, this.X + 25, this.Y + 45);
+            ctx.bezierCurveTo(this.X + 5, this.Y + 45, this.X + 5, this.Y + 10, this.X + 25, this.Y + 10);
+            ctx.closePath();
+            ctx.fillStyle = "yellow";
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = 3;
             ctx.fill();
             ctx.stroke();
 
             ctx.beginPath();
-            ctx.moveTo(this.X + 45, this.Y + 60);
-            ctx.bezierCurveTo(this.X + 5, this.Y + 75,this. X + 5, this.Y + 90, this.X + 15, this.Y + 90);
+            ctx.moveTo(this.X + 13, this.Y + 20);
+            ctx.lineTo(this.X + 37, this.Y + 20);
+            ctx.moveTo(this.X + 10, this.Y + 30);
+            ctx.lineTo(this.X + 40, this.Y + 30);
+            ctx.moveTo(this.X + 15, this.Y + 40);
+            ctx.lineTo(this.X + 35, this.Y + 40);
             ctx.closePath();
-            ctx.fillStyle = "green";
-            ctx.fill();
-            ctx.stroke();
-
-            //back shell
-            ctx.beginPath();
-            ctx.moveTo(this.X + 30, this.Y + 30);
-            ctx.bezierCurveTo(this.X + 65,this.Y + 30,this.X + 65,this.Y + 70,this.X + 50, this.Y + 70);
-            ctx.bezierCurveTo(this.X + 55, this.Y +70,this.X + 55,this.Y + 30,this.X + 30,this.Y + 30);
-            ctx.closePath();
-
-            ctx.fillStyle="brown";
-            ctx.fill();
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 1;
             ctx.stroke();
 
             ctx.beginPath();
-            ctx.moveTo(this.X +30,this.Y + 30);
-            ctx.bezierCurveTo(this.X + 55,this.Y + 30,this.X + 55,this.Y + 70,this.X + 50,this.Y + 70);
-            ctx.bezierCurveTo(this.X + 50, this.Y + 80,this.X + 15, this.Y + 80,this.X +15,this.Y +70);
-            ctx.bezierCurveTo(this.X + 10,this.Y + 70,this.X + 10,this.Y + 35,this.X + 15,this.Y + 35);
-            ctx.bezierCurveTo(this.X + 15,this.Y + 30,this.X + 35, this.Y + 30, this.X + 35, this.Y + 35);
+            ctx.moveTo(this.X + 25, this.Y);
+            ctx.bezierCurveTo(this.X + 35, this.Y, this.X + 35, this.Y + 15, this.X + 25, this.Y + 15);
+            ctx.bezierCurveTo(this.X + 15, this.Y + 15, this.X + 15, this.Y, this.X + 25, this.Y);
             ctx.closePath();
-
-            ctx.fillStyle="#f0e5c7";
-            ctx.fill();
-            ctx.stroke();
-
-            //front legs
-            ctx.beginPath();
-            ctx.moveTo(this.X + 25, this.Y + 40);
-            ctx.bezierCurveTo(this.X + 25, this.Y + 50, this.X + 45, this.Y + 50, this.X + 45, this.Y + 40);
-            ctx.closePath();
-            ctx.fillStyle = "green";
-            ctx.fill();
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.moveTo(this.X + 45,this.Y + 70);
-            ctx.bezierCurveTo(this.X + 35, this.Y + 80, this.X + 50, this.Y + 90, this.X + 55, this.Y + 80);
-            ctx.closePath();
-            ctx.fillStyle = "green";
-            ctx.fill();
-            ctx.stroke();
-
-            //head
-            ctx.beginPath();
-            ctx.moveTo(this.X + 20, this.Y + 10);
-            ctx.lineTo(this.X + 20, this.Y + 30);
-            ctx.bezierCurveTo(this.X + 20, this.Y + 35, this.X + 30, this.Y + 35, this.X + 30, this.Y + 30);
-            ctx.lineTo(this.X + 30, this.Y + 25);
-            ctx.bezierCurveTo(this.X + 30, this.Y + 20, this.X + 35, this.Y + 20, this.X + 35, this.Y + 20);
-            ctx.bezierCurveTo(this.X + 50, this.Y + 20, this.X + 50, this.Y, this.X + 35, this.Y);
-            ctx.bezierCurveTo(this.X + 20, this.Y, this.X + 20, this.Y + 10, this.X + 20, this.Y + 10);
-            ctx.closePath();
-
             ctx.fillStyle="green";
             ctx.fill();
+
+            ctx.beginPath();
+            ctx.moveTo(this.X + 15, this.Y + 15);
+            ctx.lineTo(this.X + 10, this.Y + 10);
+            ctx.closePath();
+            ctx.strokeStyle = "green";
+            ctx.lineWidth = 5;
             ctx.stroke();
 
-            //eyes
             ctx.beginPath();
-            ctx.rect(this.X + 30, this.Y + 5, 2, 5);
+            ctx.moveTo(this.X + 35, this.Y + 15);
+            ctx.lineTo(this.X + 40, this.Y + 10);
             ctx.closePath();
-            ctx.fillStyle="black";
-            ctx.fill();
+            ctx.strokeStyle = "green";
+            ctx.lineWidth = 5;
+            ctx.stroke();
 
             ctx.beginPath();
-            ctx.rect(this.X + 40, this.Y + 5, 2, 5);
+            ctx.moveTo(this.X + 15, this.Y + 40);
+            ctx.lineTo(this.X + 10, this.Y + 45);
             ctx.closePath();
-            ctx.fillStyle="black";
-            ctx.fill();
+            ctx.strokeStyle = "green";
+            ctx.lineWidth = 5;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(this.X + 35, this.Y + 40);
+            ctx.lineTo(this.X + 40, this.Y + 45);
+            ctx.closePath();
+            ctx.strokeStyle = "green";
+            ctx.lineWidth = 5;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(this.X + 20, this.Y);
+            ctx.lineTo(this.X + 20, this.Y + 5);
+            ctx.closePath();
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(this.X + 30, this.Y);
+            ctx.lineTo(this.X + 30, this.Y + 5);
+            ctx.closePath();
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
         }
         this.move = function() {
             this.X += this.speedX;
@@ -294,7 +302,7 @@ canvas {
         this.update = function() {
             ctx = race.context;
             ctx.font = "30px Arial";
-            ctx.fillText(score, 10, 10); 
+            ctx.fillText(score, 10, 30); 
         }
     }
 
