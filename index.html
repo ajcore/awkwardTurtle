@@ -23,17 +23,19 @@ canvas {
     var keys = [];
     var lineCount = 50;
     var lines = [];
-    var obstacles = [];
-    var interval = 20;
+    var tweetCount = 0;
+    var tweets = [];
+    var facebookCount = 3;
+    var facebooks = [];
+    var instaSpeed = 2500;
+    var instaCounter = 0;
     var insta;
+    var interval = 20;
+    var score = 0;
 
     function startGame() {
         race.start();
-        player = new turtle(100, 300);
-        twit1 = new twitter(200,50);
-        twit2 = new twitter(100, 200);
-        obstacles.push(twit1);
-        obstacles.push(twit2);
+        player = new turtle(race.canvas.width/2 - 50, race.canvas.height - 250);
         insta = new instagram();
 
         for (var i =0; i < lineCount; i++) {
@@ -53,26 +55,63 @@ canvas {
         player.speedX = 0;
         player.speedY = 0;
         if (keys[37]) {
-            player.speedX = -3; 
+            player.speedX = -7; 
         }
         if (keys[39]) {
-            player.speedX = 3; 
+            player.speedX = 7; 
         }
         if (keys[38]) {
-            player.speedY = -3; 
+            player.speedY = -7; 
         }
         if (keys[40]) {
-            player.speedY = 3; 
+            player.speedY = 7; 
         }
         player.move();
         player.update();
 
-        for (var i=0; i < obstacles.length; i++) {
-            obstacles[i].move();
-            obstacles[i].update();
+        if (!insta.finished()) {
+            insta.move();
+            insta.update();
         }
-        insta.move();
-        insta.update();
+
+        for (var i = 0; i < tweets.length; i++) {
+                tweets[i].move();
+                tweets[i].update();
+            
+        }
+
+        score += 1;
+        scoreBoard();
+        // facebookDificulty();
+        twitterDifficulty();
+        instagramDifficulty();
+    }
+
+    // function facebookDificulty() {
+    //     while(facebookCount > facebooks.length) {
+    //         facebooks.push(new facebook());
+    //     }
+    //     //increase count
+    //     facebookCount = score/5;
+    // }
+
+    function twitterDifficulty() {
+        while(tweetCount > tweets.length) {
+            console.log("created a tweet");
+            tweets.push(new twitter());
+        }
+        tweetCount = score/100;
+    }
+
+    function instagramDifficulty() {
+        if (instaCounter >= instaSpeed) {
+            console.log("flash");
+            instaSpeed -= 10;
+            insta.init();
+            instaCounter = 0;
+        } else {    
+            instaCounter += 1;
+        }
     }
 
     var race  = {
@@ -251,15 +290,37 @@ canvas {
 
     }
 
-    function twitter(x, y) {
-        this.X = x;
-        this.Y = y;
-        this.speedX = 3;
-        this.speedY = 1;
+    function scoreBoard() {
+        this.update = function() {
+            ctx = race.context;
+            ctx.font = "30px Arial";
+            ctx.fillText(score, 10, 10); 
+        }
+    }
+
+    function twitter() {
+        //49 because random returns 0 to 1 less than the width
+        this.X = Math.floor(Math.random() * race.canvas.width) - 49;
+        
+        this.Y = -1 * Math.floor(Math.random() * 100);
+        this.speedX = Math.floor(Math.random() * 4) + 3;
+        this.speedY = Math.floor(Math.random() * 5) + 1;
         this.counter = 0;
         this.wingUp = false;
         //false = going left, true = going right
-        this.direction = false;
+        this.direction = Math.floor(Math.random() * 2) == 0 ? true : false;
+
+        this.init = function() {
+            this.X = Math.floor(Math.random() * race.canvas.width) - 49;
+            this.Y = -1 * Math.floor(Math.random() * 100);
+            this.speedX = Math.floor(Math.random() * 4) + 3;
+            this.speedY = Math.floor(Math.random() * 5) + 1;
+            this.counter = 0;
+            this.wingUp = false;
+            //false = going left, true = going right
+            this.direction = Math.floor(Math.random() * 2) == 0 ? true : false;
+        }
+
         this.update = function() {
             ctx = race.context;
             //head and body
@@ -342,6 +403,12 @@ canvas {
             this.X += this.direction? this.speedX : (-1 * this.speedX);
             this.Y += this.speedY;
         }
+
+        this.finished = function() {
+            if (this.Y >= race.canvas.height) {
+                return true;
+            } else return false;
+        }
     }
 
     function instagram() {
@@ -350,14 +417,13 @@ canvas {
         this.Y = -100;
         this.height = 100;
         this.durationCounter = 0;
-        var step = 1;
+        var step = -1;
         var blur = 100;
 
         this.init = function() {
-            delayCounter = 0;
-            this.durationCounter= 0;
-            var blur = 100;
-            activate = true;
+            this.durationCounter = 0;
+            blur = 100;
+            step = 1;
         }
 
         this.update = function() {
@@ -394,9 +460,12 @@ canvas {
                         step = 0;
                     }
                 }
-            } else {
+            } else if (step == 0){
                 ctx.filter = 'blur(' + blur + 'px)';
                 blur -= 1;
+                if (blur == 0) {
+                    step = -1;
+                }
             }
         }
 
@@ -404,13 +473,17 @@ canvas {
             if (this.Y <= 25) {
                 this.Y += 4;
             } else {
-                if (step != 0) {
+                if (step > 0) {
                     step += 1;
                 }
             }
         }
 
-
+        this.finished = function() {
+            if (step == -1) {
+                return true;
+            } else return false;
+        }
     }
 </script>
 </body>
