@@ -53,6 +53,9 @@ canvas {
 	//flag for checking if in game over state
     var over = false;
 
+	//flag for invincibility (for testing only)
+	var invincible = false;
+
 	//initializes game
     function startGame() {
         race.start();
@@ -100,6 +103,9 @@ canvas {
             if (!over) {
                 player.speedX = 0;
                 player.speedY = 0;
+				if (keys[73]) {
+					invincible = !invincible;
+				}
                 if (keys[37]) {
                     player.speedX = -7; 
                 }
@@ -129,7 +135,7 @@ canvas {
 
                     tweets[i].move();
                     tweets[i].update();
-                    if (tweets[i].hit()) {
+                    if (tweets[i].hit() && !invincible) {
                         over = true;
                     }
                 }
@@ -547,8 +553,9 @@ canvas {
 
         this.init = function() {
             this.durationCounter = 0;
-            blur = 100;
+            this.blur = 100;
             step = 1;
+			this.Y = -100;
         }
 
         this.update = function() {
@@ -581,7 +588,8 @@ canvas {
                     ctx.fillRect(0, 0, race.canvas.width, race.canvas.height);
                     ctx.closePath();
                     this.durationCounter += 1;
-                    if (this.durationCounter > 20) {
+					//shows up for 1 second
+                    if (this.durationCounter > 50) {
                         step = 0;
                     }
                 }
