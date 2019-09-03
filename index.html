@@ -18,32 +18,48 @@ canvas {
 </head>
 <body onload="startGame()">
 <script>
+	//turtle
     var player;
     //for logging what keys are pressed
     var keys = [];
+	//number of lines in the background
     var lineCount;
+	//holds all of the lines in the background
     var lines = [];
+	//number of twitter objects to run
     var tweetCount;
+	//rate the number of twitter objects grow
     var tweetSpawn;
+	//holds all of the tweets
     var tweets = [];
     var facebookSpawn;
     var facebookCount;
     var facebooks = [];
+	//speed instagram resets to trigger
     var instaSpeed;
     var instaCounter;
+	//holds instagram object
     var insta;
+	//framerate
     var interval = 20;
+	//Final Score on a Game Over
     var finalScore;
+	//holds the score used for the scoreboard
     var score;
+	//holds the scoreboard object
     var board;
+	//flag for checking if on start screen
     var start = true;
+	//flag for checking if in game over state
     var over = false;
 
+	//initializes game
     function startGame() {
         race.start();
         initialize();
     }
 
+	//initializes variables used in the game
     function initialize() {
         score = 0;
         finalScore = 0;
@@ -64,6 +80,7 @@ canvas {
         }
     }
 
+	//everything called per frame
     function updateGame() {
         race.clear();
         for(var i = 0; i < lines.length; i++) {
@@ -141,6 +158,7 @@ canvas {
     //     facebookCount = score/5;
     // }
     
+	//represents the title screen
     function startScreen() {
         ctx = race.context;
         ctx.font = "60px Arial";
@@ -150,12 +168,14 @@ canvas {
         space(ctx);
     }
 
+	//represents instruction to hit space to start
     function space(c) {
         c.font = "20px Arial";
         c.textAlign = "center";
         c.fillText("Press Space to Start!", race.canvas.width/2, race.canvas.height - 100);
     }
 
+	//represents the game over screen
     function gameOver() {
         tweets = [];
         insta = null;
@@ -177,6 +197,7 @@ canvas {
         space(ctx);      
     }
 
+	//logic to increase spawn rate of twitter object to raise difficulty
     function twitterDifficulty() {
         while(tweetCount > tweets.length) {
             tweets.push(new twitter());
@@ -184,6 +205,7 @@ canvas {
         tweetCount = score/500;
     }
 
+	//logic to increase frequency of instagram trigger to raise difficulty
     function instagramDifficulty() {
         if (instaCounter >= instaSpeed) {
             console.log("flash");
@@ -195,6 +217,7 @@ canvas {
         }
     }
 
+	//main game object, holds the canvas (sets size and clears the canvas), sets the frame rate and holds teh event listeners
     var race  = {
         canvas: document.createElement("canvas"),
         start: function() {
@@ -228,6 +251,7 @@ canvas {
         }
     }
 
+	//returns a random color
     function getRandomColour(){
         var red = Math.floor(Math.random()* 255);
         var green = Math.floor(Math.random() * 255);
@@ -236,6 +260,7 @@ canvas {
         return "rgb("+red+","+green+"," +blue+" )";  
     }
 
+	//Creates a random line for the background and moves it down at a random rate
     function backLine() {
         this.X = Math.floor(Math.random() * race.canvas.width);
         this.Y = -1 * Math.floor(Math.random() * 300);
@@ -268,6 +293,7 @@ canvas {
         }
     }
 
+	//player's sprite
     function turtle(x, y) {
         this.X = x;
         this.Y = y;
@@ -376,6 +402,7 @@ canvas {
         }
     }
 
+	//displays the score
     function scoreBoard() {
         this.update = function() {
             ctx = race.context;
@@ -385,6 +412,7 @@ canvas {
         }
     }
 
+	//bird obstacle, moves side to side at a random rate from a random position
     function twitter() {
         //49 because random returns 0 to 1 less than the width
         this.X = Math.floor(Math.random() * race.canvas.width) - 49;
@@ -507,6 +535,7 @@ canvas {
         }
     }
 
+	//camera obstacle, flashes and blurs the canvas
     function instagram() {
         this.X = race.canvas.width/2 - 50;
         this.width = 100;
