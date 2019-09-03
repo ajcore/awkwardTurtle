@@ -32,7 +32,7 @@ canvas {
     var instaSpeed;
     var instaCounter;
     var insta;
-    var interval;
+    var interval = 20;
     var finalScore;
     var score;
     var board;
@@ -54,7 +54,6 @@ canvas {
         facebookCount = 3;
         instaSpeed = 2500;
         instaCounter = 0;
-        interval = 60;
         player = new turtle(race.canvas.width/2 - 50, race.canvas.height - 250);
         insta = new instagram();
         board = new scoreBoard();
@@ -482,10 +481,10 @@ canvas {
         }
 
         this.hit = function() {
-            if (this.X < player.X + 50 &&
-                this.X + 50 > player.X &&
-                this.Y < player.Y + 50 &&
-                this.Y + 50 > player.Y) {
+            if (this.X + 5 < player.X + 45 &&
+                this.X + 45 > player.X + 5 &&
+                this.Y + 5 < player.Y + 45 &&
+                this.Y + 45 > player.Y + 5) {
                 console.log("Hit the player!");
                 return true;
             } else return false;
