@@ -363,7 +363,7 @@ function facebook(x, y) {
             ctx = race.context;
             ctx.fillStyle = "blue";
             ctx.beginPath();
-            ctx.arc(this.x + 100, this.y + 75, 50, 0, 2 * Math.PI);
+            ctx.arc(this.X + 100, this.Y + 75, 50, 0, 2 * Math.PI);
             ctx.closePath();
             ctx.stroke();  
             ctx.fill();
@@ -371,7 +371,7 @@ function facebook(x, y) {
         }
 
         this.move = function() {
-            this.y += this.speedY;
+            this.Y += this.speedY;
         }
 
 }
