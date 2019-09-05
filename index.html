@@ -361,12 +361,19 @@ function facebook(x, y) {
         this.update = function() {
             if (step >= 1) {
             ctx = race.context;
-            ctx.fillStyle = "blue";
             ctx.beginPath();
-            ctx.arc(this.X + 100, this.Y + 75, 50, 0, 2 * Math.PI);
+            ctx.fillStyle = "blue";
+            ctx.strokeStyle = "black";
+            ctx.font ="150px verdana";
+            ctx.lineWidth = 10;
+            ctx.arc(this.X + 100, this.Y + 100, 75, 0, 2 * Math.PI, false);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.fillStyle = "white";
+            ctx.fillText("f",this.X + 75, this.Y + 170);
+            ctx.fill();
             ctx.closePath();
             ctx.stroke();  
-            ctx.fill();
             }
         }
 
