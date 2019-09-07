@@ -303,7 +303,7 @@ canvas {
         var green = Math.floor(Math.random() * 255);
         var blue = Math.floor(Math.random() * 255);
 
-        return "rgb("+red+","+green+"," +blue+" )";  
+        return "rgb("+red+","+green+"," +blue+")";  
     }
 
 	//Creates a random line for the background and moves it down at a random rate
@@ -463,15 +463,16 @@ canvas {
         this.Y = -1 * Math.floor(Math.random() * 100);;
         this.speedX = Math.floor(Math.random() * 4);
         this.speedY = Math.floor(Math.random() * 2) + 1;
+        this.radius = Math.floor(Math.random() * 75) + 1;
 
         this.update = function() {
             ctx = race.context;
             ctx.beginPath();
             ctx.fillStyle = "blue";
             ctx.strokeStyle = "black";
-            ctx.font ="150px verdana";
+            ctx.font = (this.radius * 2) + "px verdana";
             ctx.lineWidth = 10;
-            ctx.arc(this.X + 100, this.Y + 100, 75, 0, 2 * Math.PI, false);
+            ctx.arc(this.X + 100, this.Y + 100, this.radius, 0, 2 * Math.PI, false);
             ctx.fill();
             ctx.beginPath();
             ctx.fillStyle = "white";
@@ -486,11 +487,15 @@ canvas {
         }
 
         this.hit = function() {
-            if (this.X  < player.X + 45 &&
-                this.X + 150 > player.X + 5 &&
-                this.Y < player.Y + 45 &&
-                this.Y + 150 > player.Y + 5) {
-                console.log("Hit the player!");
+            //get center of the player
+            var pX = player.X + 25;
+            var pY = player.Y + 25;
+
+            //get the distance between the centers
+            var length = Math.sqrt(Math.pow((pX - this.X),2) + Math.pow((pY - this.Y), 2));
+
+            //hit if the distance is less than the sum of the radii of both
+            if (length <= (this.radius + 25)) {
                 return true;
             } else return false;
         }
@@ -500,7 +505,6 @@ canvas {
                 return true;
             } else return false;
         }
-
     }
 
 	//bird obstacle, moves side to side at a random rate from a random position
