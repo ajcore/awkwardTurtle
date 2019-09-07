@@ -34,6 +34,7 @@ canvas {
 	//holds all of the tweets
     var tweets = [];
     var facebookSpawn;
+    //holds all of the facebooks
     var facebookCount;
     var facebooks = [];
 	//speed instagram resets to trigger
@@ -72,9 +73,9 @@ canvas {
         finalScore = 0;
         lineCount = 50;
         tweetCount = 0;
-        tweetSpawn = 100;
-        facebookSpawn = 50;
-        facebookCount = 3;
+        tweetSpawn = 500;
+        facebookSpawn = 250;
+        facebookCount = 0;
         instaSpeed = 2500;
         instaCounter = 0;
         player = new turtle(race.canvas.width/2 - 50, race.canvas.height - 250);
@@ -126,10 +127,21 @@ canvas {
                 player.move();
                 player.update();
 
-                if (!insta.finished()) {
-                    insta.move();
-                    insta.update();
+                for (var i =0; i < facebooks.length; i++) {
+                    while(facebooks[i].finished()) {
+                        facebooks.splice(i,1);
+                        if (i >= facebooks.length) {
+                            break;
+                        }
+                    }
+
+                    facebooks[i].move();
+                    facebooks[i].update();
+                    if (facebooks[i].hit() && !invincible) {
+                        over = true;
+                    }
                 }
+                
                 for (var i = 0; i < tweets.length; i++) {
                     while (tweets[i].finished()) {
                         tweets.splice(i,1);
@@ -137,17 +149,25 @@ canvas {
                             break;
                         }
                     }
-
+                    if (i >= tweets.length) {
+                        break;
+                    }
                     tweets[i].move();
                     tweets[i].update();
                     if (tweets[i].hit() && !invincible) {
                         over = true;
                     }
                 }
+
+                if (!insta.finished()) {
+                    insta.move();
+                    insta.update();
+                }
+                
                 score += 1;
                 board.update();
-
-                // facebookDificulty();
+                
+                facebookDificulty();
                 twitterDifficulty();
                 instagramDifficulty();
             } else {
@@ -161,13 +181,14 @@ canvas {
         }
     }
 
-    // function facebookDificulty() {
-    //     while(facebookCount > facebooks.length) {
-    //         facebooks.push(new facebook());
-    //     }
-    //     //increase count
-    //     facebookCount = score/5;
-    // }
+    function facebookDificulty() {
+        while(facebookCount > facebooks.length) {
+            console.log("Adding a facebook instance");
+            facebooks.push(new facebook());
+        }
+        //increase count
+        facebookCount = score/facebookSpawn;
+    }
     
     function enableLoop() { 
         // create web audio api context
@@ -227,7 +248,7 @@ canvas {
         while(tweetCount > tweets.length) {
             tweets.push(new twitter());
         }
-        tweetCount = score/500;
+        tweetCount = score/tweetSpawn;
     }
 
 	//logic to increase frequency of instagram trigger to raise difficulty
@@ -435,6 +456,51 @@ canvas {
             ctx.font = "30px Arial";
             ctx.fillText(score, 10, 30); 
         }
+    }
+
+    function facebook() {
+        this.X = Math.floor(Math.random() * race.canvas.width);
+        this.Y = -1 * Math.floor(Math.random() * 100);;
+        this.speedX = Math.floor(Math.random() * 4);
+        this.speedY = Math.floor(Math.random() * 2) + 1;
+
+        this.update = function() {
+            ctx = race.context;
+            ctx.beginPath();
+            ctx.fillStyle = "blue";
+            ctx.strokeStyle = "black";
+            ctx.font ="150px verdana";
+            ctx.lineWidth = 10;
+            ctx.arc(this.X + 100, this.Y + 100, 75, 0, 2 * Math.PI, false);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.fillStyle = "white";
+            ctx.fillText("f",this.X + 75, this.Y + 170);
+            ctx.fill();
+            ctx.closePath();
+            ctx.stroke();  
+        }
+
+        this.move = function() {
+            this.Y += this.speedY;
+        }
+
+        this.hit = function() {
+            if (this.X  < player.X + 45 &&
+                this.X + 150 > player.X + 5 &&
+                this.Y < player.Y + 45 &&
+                this.Y + 150 > player.Y + 5) {
+                console.log("Hit the player!");
+                return true;
+            } else return false;
+        }
+
+        this.finished = function() {
+            if (this.Y >= race.canvas.height) {
+                return true;
+            } else return false;
+        }
+
     }
 
 	//bird obstacle, moves side to side at a random rate from a random position
