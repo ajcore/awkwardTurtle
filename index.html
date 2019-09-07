@@ -17,6 +17,7 @@ canvas {
 </style>
 </head>
 <body onload="startGame()">
+
 <script>
 	//turtle
     var player;
@@ -54,7 +55,10 @@ canvas {
     var over = false;
 
 	//flag for invincibility (for testing only)
-	var invincible = false;
+    var invincible = false;
+    
+    //song
+    var oscillator;
 
 	//initializes game
     function startGame() {
@@ -81,6 +85,7 @@ canvas {
                 lines.push(new backLine());
             }
         }
+        enableLoop();
     }
 
 	//everything called per frame
@@ -164,6 +169,19 @@ canvas {
     //     facebookCount = score/5;
     // }
     
+    function enableLoop() { 
+        // create web audio api context
+        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // create Oscillator node
+        oscillator = audioCtx.createOscillator();
+
+        oscillator.type = 'square';
+        oscillator.frequency.setValueAtTime(3000, audioCtx.currentTime); // value in hertz
+        oscillator.connect(audioCtx.destination);
+        oscillator.start();
+    } 
+
 	//represents the title screen
     function startScreen() {
         ctx = race.context;
@@ -183,6 +201,7 @@ canvas {
 
 	//represents the game over screen
     function gameOver() {
+        disableLoop();
         tweets = [];
         insta = null;
         player = null;
