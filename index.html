@@ -112,7 +112,10 @@ canvas {
                 player.speedX = 0;
                 player.speedY = 0;
 				if (keys[73]) {
-					invincible = !invincible;
+					invincible = true;
+				}
+                if (keys[85]) {
+					invincible = false;
 				}
                 if (keys[37]) {
                     player.speedX = -7; 
