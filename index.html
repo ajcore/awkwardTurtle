@@ -480,7 +480,7 @@ canvas {
         this.Y = -1 * Math.floor(Math.random() * 100);;
         this.speedX = Math.floor(Math.random() * 4);
         this.speedY = Math.floor(Math.random() * 2) + 1;
-        this.radius = Math.floor(Math.random() * 25) + 50;
+        this.radius = Math.floor(Math.random() * 11) + 15;
 
         this.update = function() {
             ctx = race.context;
@@ -493,7 +493,7 @@ canvas {
             ctx.fill();
             ctx.beginPath();
             ctx.fillStyle = "white";
-            ctx.fillText("f",this.X - 25, this.Y + 50);
+            ctx.fillText("f",this.X -5, this.Y + this.radius);
             ctx.fill();
             ctx.closePath();
             ctx.stroke();  
