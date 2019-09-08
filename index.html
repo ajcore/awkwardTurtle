@@ -58,8 +58,11 @@ canvas {
 	//flag for invincibility (for testing only)
     var invincible = false;
     
-    //song
-    var oscillator;
+    // var Cnote;
+    // var Dnote;
+    // var volume;
+    // var musicCounter = 0;
+
 
 	//initializes game
     function startGame() {
@@ -86,7 +89,6 @@ canvas {
                 lines.push(new backLine());
             }
         }
-        enableLoop();
     }
 
 	//everything called per frame
@@ -190,18 +192,33 @@ canvas {
         facebookCount = score/facebookSpawn;
     }
     
-    function enableLoop() { 
-        // create web audio api context
-        var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // async function initMusic() {
+    //     // create web audio api context
+    //     var audioCtx = new (window.AudioContext || window.webkitAudioContext)
+    //     // we create the gain module, named as volume, and connect it to our
+    //     volume = audioCtx.createGain();
+    //     Cnote = audioCtx.createOscillator();
+    //     Cnote.frequency.value = 130.8128;
+    //     Cnote.type = "sine";
+    //     Dnote = audioCtx.createOscillator();
+    //     Dnote.frequency.value = 293.6648;
+    //     Dnote.type = "sine";
+    //     EmptyNote = audioCtx.createOscillator();
+    //     EmptyNote.frequency.value = 0;
+    //     EmptyNote.type = "sine";
+    //     volume.gain.value=0.2;
+    //     while (true) {
+    //         Cnote.start();
+    //         Cnote.stop(audioCtx.currentTime + 1);
+    //         Dnote.start();
+    //         Dnote.stop(audioCtx.currentTime + 1);
+    //         Cnote.start();
+    //         Cnote.stop(audioCtx.currentTime + 1);
+    //         EmptyNote.start();
+    //         EmptyNote.stop(audioCtx.currentTime + 1);
+    //     }
+    // }
 
-        // create Oscillator node
-        oscillator = audioCtx.createOscillator();
-
-        oscillator.type = 'square';
-        oscillator.frequency.setValueAtTime(3000, audioCtx.currentTime); // value in hertz
-        oscillator.connect(audioCtx.destination);
-        oscillator.start();
-    } 
 
 	//represents the title screen
     function startScreen() {
@@ -222,7 +239,6 @@ canvas {
 
 	//represents the game over screen
     function gameOver() {
-        disableLoop();
         tweets = [];
         insta = null;
         player = null;
