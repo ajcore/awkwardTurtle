@@ -115,8 +115,13 @@
 
                     facebooks[i].move();
                     facebooks[i].update();
-                    if (facebooks[i].hit() && !invincible) {
-                        over = true;
+                    if (facebooks[i].hit()  && !invincible) {
+                        player.hp -= 1;
+
+                        if (player.hp <= 0) {
+                            over = true;
+                        }
+                        
                     }
                 }
                 
@@ -132,8 +137,12 @@
                     }
                     tweets[i].move();
                     tweets[i].update();
-                    if (tweets[i].hit() && !invincible) {
-                        over = true;
+                    if (tweets[i].hit() && player.hp > 0 && !invincible) {
+                        player.hp -= 1;
+
+                        if (player.hp <= 0) {
+                            over = true;
+                        }
                     }
                 }
 
@@ -299,6 +308,7 @@
         this.speedY = 0;
         this.frameSpeed = 15;
         this.currentFrame = 0;
+        this.hp = 300;
         this.update = function() {
             ctx = race.context;
             ctx.beginPath();
@@ -388,6 +398,13 @@
             ctx.lineWidth = 2;
             ctx.stroke();
 
+            ctx.beginPath();
+            ctx.moveTo(race.canvas.width - 50, 50);
+            ctx.lineTo(race.canvas.width - 50 - (this.hp/5), 50);
+            ctx.closePath();
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 15;
+            ctx.stroke();
         }
 
         this.move = function() {
