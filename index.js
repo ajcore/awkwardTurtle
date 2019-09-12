@@ -467,6 +467,7 @@
             ctx = race.context;
             ctx.textAlign = "left";
             ctx.font = "30px Arial";
+            ctx.fillStyle = "purple";
             ctx.fillText(score, 10, 30); 
         }
     }
