@@ -33,6 +33,8 @@
     var start = true;
 	//flag for checking if in game over state
     var over = false;
+    //flag for winning (get 13k points)
+    var win = false;
 
 	//flag for invincibility (for testing only)
     var invincible = false;
@@ -49,8 +51,8 @@
         finalScore = 0;
         lineCount = 50;
         tweetCount = 0;
-        tweetSpawn = 500;
-        facebookSpawn = 250;
+        tweetSpawn = 1000;
+        facebookSpawn = 400;
         facebookCount = 0;
         instaSpeed = 2500;
         instaCounter = 0;
@@ -78,6 +80,7 @@
                 start = false;
                 initialize();
                 over = false;
+                win = false;
             }
         }
         else {
@@ -104,7 +107,7 @@
                 }
                 player.move();
                 player.update();
-
+                var currentHp = player.hp;
                 for (var i =0; i < facebooks.length; i++) {
                     while(facebooks[i].finished()) {
                         facebooks.splice(i,1);
@@ -117,12 +120,12 @@
                     facebooks[i].update();
                     if (facebooks[i].hit()  && !invincible) {
                         player.hp -= 1;
-
+                        player.color = "red";
                         if (player.hp <= 0) {
                             over = true;
                         }
                         
-                    }
+                    } 
                 }
                 
                 for (var i = 0; i < tweets.length; i++) {
@@ -137,13 +140,17 @@
                     }
                     tweets[i].move();
                     tweets[i].update();
-                    if (tweets[i].hit() && player.hp > 0 && !invincible) {
+                    if (tweets[i].hit() && !invincible) {
                         player.hp -= 1;
-
+                        player.color = "red";
                         if (player.hp <= 0) {
                             over = true;
                         }
-                    }
+                    } 
+                }
+
+                if (currentHp === player.hp) {
+                    player.color = "green";
                 }
 
                 if (!insta.finished()) {
@@ -157,7 +164,21 @@
                 facebookDificulty();
                 twitterDifficulty();
                 instagramDifficulty();
-            } else {
+
+                if (score >= 13000) {
+                    finalScore = 13000;
+                    over = true;
+                    win = true;
+                }
+            } else if (over && win) {
+                winner();
+                if (keys[32]) {
+                    initialize();
+                    over = false;
+                    win = false;
+                }
+            } 
+            else {
                 gameOver();
                 if (keys[32]) {
                     //reinitialize
@@ -194,6 +215,30 @@
         c.fillText("Press Space to Start!", race.canvas.width/2, race.canvas.height - 100);
     }
 
+    //represents the win screen
+    function winner() {
+        facebooks = [];
+        tweets = [];
+        insta = null;
+        player = null;
+        board = null;
+
+        //draw gameover
+        ctx = race.context;
+        race.canvas.style.webkitFilter = "blur(0px)";
+        ctx.font = "60px Arial";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "green";
+        ctx.fillText("YOU WIN!", race.canvas.width/2, race.canvas.height/2); 
+
+        ctx.font = "80px Arial";
+        ctx.textAlign = "center";
+        ctx.fillStyle = getRandomColour();
+        ctx.fillText(finalScore, race.canvas.width/2, race.canvas.height/2 - 100);   
+
+        space(ctx);
+    }
+
 	//represents the game over screen
     function gameOver() {
         facebooks = [];
@@ -201,9 +246,7 @@
         insta = null;
         player = null;
         board = null;
-        if (finalScore == 0) {
-            finalScore = score;
-        }
+        finalScore = score;
 
         //draw gameover
         ctx = race.context;
@@ -309,6 +352,7 @@
         this.frameSpeed = 15;
         this.currentFrame = 0;
         this.hp = 300;
+        this.color = "green";
         this.update = function() {
             ctx = race.context;
             ctx.beginPath();
@@ -347,14 +391,14 @@
             ctx.bezierCurveTo(this.X + 35, this.Y, this.X + 35, this.Y + 15, this.X + 25, this.Y + 15);
             ctx.bezierCurveTo(this.X + 15, this.Y + 15, this.X + 15, this.Y, this.X + 25, this.Y);
             ctx.closePath();
-            ctx.fillStyle="green";
+            ctx.fillStyle = this.color;
             ctx.fill();
 
             ctx.beginPath();
             ctx.moveTo(this.X + 15, this.Y + 15);
             ctx.lineTo(this.X + 10, this.Y + 10);
             ctx.closePath();
-            ctx.strokeStyle = "green";
+            ctx.strokeStyle = this.color;
             ctx.lineWidth = 5;
             ctx.stroke();
 
@@ -362,7 +406,7 @@
             ctx.moveTo(this.X + 35, this.Y + 15);
             ctx.lineTo(this.X + 40, this.Y + 10);
             ctx.closePath();
-            ctx.strokeStyle = "green";
+            ctx.strokeStyle = this.color;
             ctx.lineWidth = 5;
             ctx.stroke();
 
@@ -370,7 +414,7 @@
             ctx.moveTo(this.X + 15, this.Y + 40);
             ctx.lineTo(this.X + 10, this.Y + 45);
             ctx.closePath();
-            ctx.strokeStyle = "green";
+            ctx.strokeStyle = this.color;
             ctx.lineWidth = 5;
             ctx.stroke();
 
@@ -378,7 +422,7 @@
             ctx.moveTo(this.X + 35, this.Y + 40);
             ctx.lineTo(this.X + 40, this.Y + 45);
             ctx.closePath();
-            ctx.strokeStyle = "green";
+            ctx.strokeStyle = this.color;
             ctx.lineWidth = 5;
             ctx.stroke();
 
@@ -400,7 +444,7 @@
 
             ctx.beginPath();
             ctx.moveTo(race.canvas.width - 50, 50);
-            ctx.lineTo(race.canvas.width - 50 - (this.hp/5), 50);
+            ctx.lineTo(race.canvas.width - 50 - this.hp, 50);
             ctx.closePath();
             ctx.strokeStyle = "red";
             ctx.lineWidth = 15;
@@ -510,7 +554,7 @@
                 ctx.bezierCurveTo(this.X + 10, this.Y +50, this.X + 40, this.Y +50, this.X + 40, this.Y +20);
                 ctx.lineTo(this.X + 50, this.Y +20);
                 ctx.closePath();
-                ctx.fillStyle = "blue";
+                ctx.fillStyle = "#1da1f2";
                 ctx.fill();
                 ctx.lineWidth = 2;
                 ctx.stroke();
@@ -521,7 +565,7 @@
                     ctx.moveTo(this.X + 30, this.Y + 20);
                     ctx.bezierCurveTo(this.X + 20, this.Y + 30, this.X, this.Y + 10, this.X + 10, this.Y);
                     ctx.closePath();
-                    ctx.fillStyle = "blue";
+                    ctx.fillStyle = "#1da1f2";
                     ctx.fill();
                     ctx.lineWidth = 2;
                     ctx.stroke();
@@ -530,7 +574,7 @@
                     ctx.moveTo(this.X + 30, this.Y + 20);
                     ctx.bezierCurveTo(this.X + 10, this.Y + 20, this.X + 10, this.Y + 40, this.X + 30, this.Y + 40);
                     ctx.closePath();
-                    ctx.fillStyle = "blue";
+                    ctx.fillStyle = "#1da1f2";
                     ctx.fill();
                     ctx.lineWidth = 2;
                     ctx.stroke();
@@ -543,7 +587,7 @@
                 ctx.bezierCurveTo(this.X + 40, this.Y +50, this.X + 10, this.Y +50, this.X + 10, this.Y +20);
                 ctx.lineTo(this.X, this.Y +20);
                 ctx.closePath();
-                ctx.fillStyle = "blue";
+                ctx.fillStyle = "#1da1f2";
                 ctx.fill();
                 ctx.lineWidth = 2;
                 ctx.stroke();
@@ -554,7 +598,7 @@
                     ctx.moveTo(this.X + 20, this.Y + 20);
                     ctx.bezierCurveTo(this.X + 30, this.Y + 30, this.X + 50, this.Y + 10, this.X + 40, this.Y);
                     ctx.closePath();
-                    ctx.fillStyle = "blue";
+                    ctx.fillStyle = "#1da1f2";
                     ctx.fill();
                     ctx.lineWidth = 2;
                     ctx.stroke();
@@ -563,7 +607,7 @@
                     ctx.moveTo(this.X + 20, this.Y + 20);
                     ctx.bezierCurveTo(this.X + 40, this.Y + 20, this.X + 40, this.Y + 40, this.X + 20, this.Y + 40);
                     ctx.closePath();
-                    ctx.fillStyle = "blue";
+                    ctx.fillStyle = "#1da1f2";
                     ctx.fill();
                     ctx.lineWidth = 2;
                     ctx.stroke();
