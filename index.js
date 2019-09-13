@@ -205,6 +205,9 @@
         ctx.textAlign = "center";
         ctx.fillText("Awkward", race.canvas.width/2, race.canvas.height/2 - 30);
         ctx.fillText("Turtle", race.canvas.width/2, race.canvas.height/2 + 30); 
+        ctx.font = "20px Arial";
+        ctx.textAlign = "center";
+        ctx.fillText("Use the arrow keys to move!", race.canvas.width/2, race.canvas.height/2 + 100); 
         space(ctx);
     }
 
