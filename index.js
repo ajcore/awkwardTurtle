@@ -161,7 +161,7 @@
                 score += 1;
                 board.update();
                 
-                facebookDificulty();
+                facebookDifficulty();
                 twitterDifficulty();
                 instagramDifficulty();
 
@@ -189,7 +189,7 @@
         }
     }
 
-    function facebookDificulty() {
+    function facebookDifficulty() {
         while(facebookCount > facebooks.length) {
             console.log("Adding a facebook instance");
             facebooks.push(new facebook());
@@ -203,11 +203,12 @@
         ctx = race.context;
         ctx.font = "60px Arial";
         ctx.textAlign = "center";
+        ctx.fillStyle = "green";
         ctx.fillText("Awkward", race.canvas.width/2, race.canvas.height/2 - 30);
         ctx.fillText("Turtle", race.canvas.width/2, race.canvas.height/2 + 30); 
         ctx.font = "20px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText("Use the arrow keys to move!", race.canvas.width/2, race.canvas.height/2 + 100); 
+        ctx.fillStyle = "purple";
+        ctx.fillText("Use arrow buttons to move turtle",race.canvas.width/2, race.canvas.height/2 + 100);
         space(ctx);
     }
 
@@ -215,6 +216,7 @@
     function space(c) {
         c.font = "20px Arial";
         c.textAlign = "center";
+        c.fillStyle = "red";
         c.fillText("Press Space to Start!", race.canvas.width/2, race.canvas.height - 100);
     }
 
